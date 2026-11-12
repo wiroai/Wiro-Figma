@@ -93,11 +93,12 @@ export function isFigmaFormat(format: ImageFormat): boolean {
   return format === 'png' || format === 'jpeg' || format === 'gif';
 }
 
-/** Redraws an image as PNG or JPEG at the given size. */
+/** Redraws an image as PNG or JPEG, scaled down to at most `maxSide` px a side. */
 export type Redraw = (
   bytes: Uint8Array,
   size: Size | undefined,
   type: 'image/png' | 'image/jpeg',
+  maxSide?: number,
 ) => Promise<Converted>;
 
 export interface Converted {
@@ -121,7 +122,14 @@ export async function prepareImage(
   options: { fetchImpl?: Fetcher; redraw?: Redraw; signal?: AbortSignal } = {},
 ): Promise<ImagePayload> {
   const fetchImpl = options.fetchImpl ?? ((input, init) => fetch(input, init));
-  const response = await fetchImpl(url, { signal: options.signal });
+  let response: Response;
+  try {
+    response = await fetchImpl(url, { signal: options.signal });
+  } catch {
+    throw new ImageError(
+      'The image is ready but could not be downloaded. It is in Recent: click it there to try again.',
+    );
+  }
   if (!response.ok) throw new ImageError(`The image could not be downloaded (HTTP ${response.status}).`);
   const bytes = new Uint8Array(await response.arrayBuffer());
   if (bytes.length === 0) throw new ImageError('The image file was empty.');
@@ -132,26 +140,26 @@ export async function prepareImage(
   }
   // GIFs are redrawn as PNG (only the first frame survives); photos stay JPEG.
   const redraw = options.redraw ?? redrawOnCanvas;
-  const converted = await redraw(bytes, size, format === 'jpeg' ? 'image/jpeg' : 'image/png');
+  const converted = await redraw(bytes, size, format === 'jpeg' ? 'image/jpeg' : 'image/png', MAX_IMAGE_SIDE);
   return { bytes: converted.bytes, width: converted.width, height: converted.height, url };
 }
 
 /** The browser path: decode with createImageBitmap, draw scaled down, encode. */
-export const redrawOnCanvas: Redraw = async (bytes, _size, type) => {
+export const redrawOnCanvas: Redraw = async (bytes, _size, type, maxSide = MAX_IMAGE_SIDE) => {
   let bitmap: ImageBitmap;
   try {
     bitmap = await createImageBitmap(new Blob([bytes as BlobPart]));
   } catch {
     throw new ImageError('This image format could not be read.');
   }
-  const target = fitWithin({ width: bitmap.width, height: bitmap.height }, MAX_IMAGE_SIDE);
+  const target = fitWithin({ width: bitmap.width, height: bitmap.height }, maxSide);
   let blob: Blob | null;
   if (typeof OffscreenCanvas !== 'undefined') {
     const canvas = new OffscreenCanvas(target.width, target.height);
     const context = canvas.getContext('2d');
     if (!context) throw new ImageError('The image could not be redrawn.');
     context.drawImage(bitmap, 0, 0, target.width, target.height);
-    blob = await canvas.convertToBlob({ type, quality: 0.92 });
+    blob = await canvas.convertToBlob({ type, quality: 0.9 });
   } else {
     const canvas = document.createElement('canvas');
     canvas.width = target.width;
@@ -159,9 +167,82 @@ export const redrawOnCanvas: Redraw = async (bytes, _size, type) => {
     const context = canvas.getContext('2d');
     if (!context) throw new ImageError('The image could not be redrawn.');
     context.drawImage(bitmap, 0, 0, target.width, target.height);
-    blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, type, 0.92));
+    blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, type, 0.9));
   }
   bitmap.close();
   if (!blob) throw new ImageError('The image could not be redrawn.');
   return { bytes: new Uint8Array(await blob.arrayBuffer()), width: target.width, height: target.height };
 };
+
+// ---------------------------------------------------------------------------
+// Images sent to a model
+
+/**
+ * The largest image sent to a model, in bytes. Base64 makes it a third larger,
+ * and the MCP endpoint takes request bodies up to 4 MB.
+ */
+export const MAX_INPUT_BYTES = 2_400_000;
+
+/** Images sent to a model are at most this many pixels a side. */
+export const MAX_INPUT_SIDE = 2048;
+
+const MIME: Record<ImageFormat, string> = {
+  png: 'image/png',
+  jpeg: 'image/jpeg',
+  gif: 'image/gif',
+  webp: 'image/webp',
+  other: 'application/octet-stream',
+};
+
+export function toBase64(bytes: Uint8Array): string {
+  let binary = '';
+  const chunk = 0x8000;
+  for (let at = 0; at < bytes.length; at += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(at, at + chunk));
+  }
+  return btoa(binary);
+}
+
+/**
+ * A selected layer's image as a data URI a model can read. Images within the
+ * limits go as they are; larger ones are scaled down, PNG first (it keeps
+ * transparency), JPEG when PNG stays too big.
+ */
+export async function inputDataUri(
+  image: { bytes: Uint8Array; width: number; height: number },
+  options: { maxBytes?: number; maxSide?: number; redraw?: Redraw } = {},
+): Promise<string> {
+  const maxBytes = options.maxBytes ?? MAX_INPUT_BYTES;
+  const maxSide = options.maxSide ?? MAX_INPUT_SIDE;
+  const redraw = options.redraw ?? redrawOnCanvas;
+  const format = sniffFormat(image.bytes);
+  const known = format !== 'other';
+  if (known && image.bytes.length <= maxBytes && Math.max(image.width, image.height) <= maxSide) {
+    return `data:${MIME[format]};base64,${toBase64(image.bytes)}`;
+  }
+  const size = { width: image.width, height: image.height };
+  let side = Math.min(maxSide, Math.max(image.width, image.height));
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    const types: Array<'image/png' | 'image/jpeg'> = format === 'jpeg' ? ['image/jpeg'] : ['image/png', 'image/jpeg'];
+    for (const type of types) {
+      const converted = await redraw(image.bytes, size, type, side);
+      if (converted.bytes.length <= maxBytes) return `data:${type};base64,${toBase64(converted.bytes)}`;
+    }
+    side = Math.round(side * 0.75);
+  }
+  throw new ImageError('The selected image is too large to send. Try a smaller layer.');
+}
+
+/** Downloads an SVG result as text. */
+export async function fetchSvg(url: string, fetchImpl: Fetcher = (input, init) => fetch(input, init)): Promise<string> {
+  let response: Response;
+  try {
+    response = await fetchImpl(url);
+  } catch {
+    throw new ImageError('The vector is ready but could not be downloaded. Try again from History.');
+  }
+  if (!response.ok) throw new ImageError(`The vector could not be downloaded (HTTP ${response.status}).`);
+  const text = await response.text();
+  if (!/<svg[\s>]/i.test(text)) throw new ImageError('The model did not return an SVG.');
+  return text;
+}

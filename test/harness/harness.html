@@ -63,6 +63,21 @@
         background: transparent;
         outline: 1px dashed rgba(0, 0, 0, 0.35);
       }
+      .node .content {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        line-height: 1.2;
+        color: #1e1e1e;
+        font-family:
+          Inter,
+          -apple-system,
+          sans-serif;
+      }
+      .node.text {
+        background: transparent;
+        outline: 1px dashed rgba(0, 0, 0, 0.12);
+      }
       .node.selected {
         outline: 6px solid var(--select);
         z-index: 1;

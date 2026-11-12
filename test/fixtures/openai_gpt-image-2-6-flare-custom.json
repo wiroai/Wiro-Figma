@@ -1,0 +1,312 @@
+{
+  "slug": "openai/gpt-image-2-6-flare-custom",
+  "title": "GPT Image 2.6 Flare Custom",
+  "description": "Fast image generation and edits with custom sizing, masks, markup hints, and GIF output. Try GPT Image 2.6 Flare Custom by OpenAI on Wiro now.",
+  "categories": ["partner", "openai", "text-to-image", "image-to-image", "image-editing", "nogpu-pipeline"],
+  "pricing": "Set by the run when it ends: Pricing is calculated from input and output tokens reported by OpenAI: text input $5 / 1M tokens, image input $8 / 1M tokens, image output $30 / 1M tokens. SVG output also bills the gpt-6.1-terra tokens that write the SVG: $1 / 1M input, $5 / 1M output. The final price is computed when the task finishes.",
+  "estimatedCostUsd": null,
+  "pricingNotes": [
+    "Pricing is calculated from input and output tokens reported by OpenAI: text input $5 / 1M tokens, image input $8 / 1M tokens, image output $30 / 1M tokens. SVG output also bills the gpt-6.1-terra tokens that write the SVG: $1 / 1M input, $5 / 1M output. The final price is computed when the task finishes."
+  ],
+  "parameters": [
+    {
+      "title": "",
+      "items": [
+        {
+          "id": "inputImage",
+          "type": "combinefileinput",
+          "label": "Input Images",
+          "sample": "https://cdn.wiro.ai/uploads/sampleinputs/openai-gpt-image-2-6-flare-custom-sampleinput-1.webp",
+          "required": false,
+          "placeholder": "Input Images",
+          "note": "Optional. Input images to edit, up to 16. With input images the output can be an image or an animated GIF. If the output format is svg, input images are not used: the SVG is made from the prompt alone.",
+          "options": [],
+          "advanced": false
+        },
+        {
+          "id": "prompt",
+          "type": "textarea",
+          "label": "Prompt",
+          "sample": "Turn every chess piece into clear cut crystal glass, the light pieces in clear crystal and the dark pieces in smoky amber crystal, each glowing softly from inside and casting colorful light refractions on the board. Keep the position of every piece, the wooden board, the table, the plant and the window light exactly the same.",
+          "required": true,
+          "placeholder": "Enter your prompt...",
+          "note": "Required. Text description of the desired image, image edit, GIF animation or SVG. Maximum 32,000 characters.",
+          "options": [],
+          "advanced": false
+        },
+        {
+          "id": "width",
+          "type": "number",
+          "label": "Width",
+          "sample": "1024",
+          "required": true,
+          "placeholder": "Width",
+          "note": "Required. Output width in pixels, at most 3840. Images and SVG: long:short ratio at most 3:1 and 655,360–8,294,400 total pixels; non-16-aligned values are snapped and resized to your exact request. GIF: the width of each frame, snapped to a multiple of 16; frames that would not fit together are shrunk.",
+          "options": [],
+          "min": 16,
+          "max": 3840,
+          "step": 1,
+          "advanced": false
+        },
+        {
+          "id": "height",
+          "type": "number",
+          "label": "Height",
+          "sample": "1024",
+          "required": true,
+          "placeholder": "Height",
+          "note": "Required. Output height in pixels, at most 3840. Images and SVG: long:short ratio at most 3:1 and 655,360–8,294,400 total pixels; non-16-aligned values are snapped and resized to your exact request. GIF: the height of each frame, snapped to a multiple of 16; frames that would not fit together are shrunk.",
+          "options": [],
+          "min": 16,
+          "max": 3840,
+          "step": 1,
+          "advanced": false
+        },
+        {
+          "id": "quality",
+          "type": "select",
+          "label": "Quality",
+          "sample": "low",
+          "required": true,
+          "placeholder": "Quality",
+          "note": "Required. Output image quality.",
+          "options": [
+            {
+              "label": "Low",
+              "value": "low"
+            },
+            {
+              "label": "Medium",
+              "value": "medium"
+            },
+            {
+              "label": "High",
+              "value": "high"
+            },
+            {
+              "label": "Extra High",
+              "value": "xhigh"
+            },
+            {
+              "label": "Max",
+              "value": "max"
+            }
+          ],
+          "advanced": false
+        },
+        {
+          "id": "samples",
+          "type": "number",
+          "label": "Number of Images",
+          "sample": "1",
+          "required": true,
+          "placeholder": "Number of Images",
+          "note": "Required. Number of images to generate (1-10). SVG output always makes 1.",
+          "options": [],
+          "min": 1,
+          "max": 10,
+          "step": 1,
+          "advanced": false
+        },
+        {
+          "id": "outputFormat",
+          "type": "select",
+          "label": "Output Format",
+          "default": "jpeg",
+          "required": false,
+          "placeholder": "Output Format",
+          "note": "Optional. Default jpeg. Output format. gif makes an animated GIF, with or without input images. svg makes a vector image from the prompt alone; input images, mask and markup are not used.",
+          "options": [
+            {
+              "label": "png",
+              "value": "png"
+            },
+            {
+              "label": "jpeg",
+              "value": "jpeg"
+            },
+            {
+              "label": "webp",
+              "value": "webp"
+            },
+            {
+              "label": "gif",
+              "value": "gif"
+            },
+            {
+              "label": "svg",
+              "value": "svg"
+            }
+          ],
+          "advanced": true
+        },
+        {
+          "id": "frameCount",
+          "type": "number",
+          "label": "Frame Count (GIF)",
+          "default": "9",
+          "required": false,
+          "placeholder": "Frame Count (GIF only)",
+          "note": "Optional. Default 9. Number of frames in the GIF (2-16). GIF output only.",
+          "options": [],
+          "min": 2,
+          "max": 16,
+          "step": 1,
+          "advanced": true
+        },
+        {
+          "id": "frameDurationMs",
+          "type": "number",
+          "label": "Frame Duration (GIF)",
+          "default": "200",
+          "required": false,
+          "placeholder": "Frame Duration in ms (GIF only)",
+          "note": "Optional. Default 200. How long each frame shows, in milliseconds (20-2000, rounded to 10). GIF output only.",
+          "options": [],
+          "min": 20,
+          "max": 2000,
+          "step": 10,
+          "advanced": true
+        },
+        {
+          "id": "svgReasoning",
+          "type": "select",
+          "label": "SVG Reasoning (SVG)",
+          "default": "low",
+          "required": false,
+          "placeholder": "SVG Reasoning (SVG only)",
+          "note": "Optional. Default low. How much gpt-6.1-terra, which writes the SVG, reasons before drawing. Higher can give cleaner, more detailed vectors at a higher cost. SVG output only.",
+          "options": [
+            {
+              "label": "None",
+              "value": "none"
+            },
+            {
+              "label": "Low",
+              "value": "low"
+            },
+            {
+              "label": "Medium",
+              "value": "medium"
+            },
+            {
+              "label": "High",
+              "value": "high"
+            },
+            {
+              "label": "Extra High",
+              "value": "xhigh"
+            },
+            {
+              "label": "Max",
+              "value": "max"
+            }
+          ],
+          "advanced": true
+        },
+        {
+          "id": "inputImageMask",
+          "type": "combinefileinput",
+          "label": "Mask Image (Edit)",
+          "required": false,
+          "placeholder": "Mask Image (Edit only)",
+          "note": "Optional. Requires an input image. Mask image that defines the areas to edit. Not used with GIF or SVG output.",
+          "options": [],
+          "advanced": true
+        },
+        {
+          "id": "inputImageMarkup",
+          "type": "combinefileinput",
+          "label": "Markup Image (Edit)",
+          "required": false,
+          "placeholder": "Markup Image (Edit only)",
+          "note": "Optional. Requires an input image. A transparent overlay with marks (a circle, an arrow) showing where the prompt's change should go. Not used with SVG output.",
+          "options": [],
+          "advanced": true
+        },
+        {
+          "id": "complexity",
+          "type": "select",
+          "label": "Complexity",
+          "default": "high",
+          "required": false,
+          "placeholder": "Complexity",
+          "note": "Optional. Default high. How much the model plans before rendering: lower suits focused edits, higher helps dense text and complex layouts. It does not change the price.",
+          "options": [
+            {
+              "label": "Low",
+              "value": "low"
+            },
+            {
+              "label": "Medium",
+              "value": "medium"
+            },
+            {
+              "label": "High",
+              "value": "high"
+            }
+          ],
+          "advanced": true
+        },
+        {
+          "id": "background",
+          "type": "select",
+          "label": "Background",
+          "default": "auto",
+          "required": false,
+          "placeholder": "Background",
+          "note": "Optional. Default auto. Background setting. Transparent needs png or webp output; with jpeg it switches to png.",
+          "options": [
+            {
+              "label": "Auto",
+              "value": "auto"
+            },
+            {
+              "label": "Transparent",
+              "value": "transparent"
+            },
+            {
+              "label": "Opaque",
+              "value": "opaque"
+            }
+          ],
+          "advanced": true
+        },
+        {
+          "id": "outputCompression",
+          "type": "number",
+          "label": "Output Compression",
+          "default": "100",
+          "required": false,
+          "placeholder": "Output Compression (0-100)",
+          "note": "Optional. Default 100. Compression level (0-100) for jpeg or webp output only.",
+          "options": [],
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "advanced": true
+        },
+        {
+          "id": "moderation",
+          "type": "select",
+          "label": "Moderation Level",
+          "default": "low",
+          "required": false,
+          "placeholder": "Moderation Level",
+          "note": "Optional. Default low. Content moderation level.",
+          "options": [
+            {
+              "label": "Auto",
+              "value": "auto"
+            },
+            {
+              "label": "Low",
+              "value": "low"
+            }
+          ],
+          "advanced": true
+        }
+      ]
+    }
+  ]
+}

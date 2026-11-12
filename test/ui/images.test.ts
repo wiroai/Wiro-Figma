@@ -1,5 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { ImageError, isFigmaFormat, prepareImage, readSize, sniffFormat, type Redraw } from '../../src/ui/images';
+import {
+  fetchSvg,
+  ImageError,
+  inputDataUri,
+  isFigmaFormat,
+  prepareImage,
+  readSize,
+  sniffFormat,
+  toBase64,
+  type Redraw,
+} from '../../src/ui/images';
 
 function png(width: number, height: number): Uint8Array {
   const bytes = new Uint8Array(33);
@@ -60,9 +70,9 @@ function fetchOf(bytes: Uint8Array, status = 200) {
 }
 
 function recordingRedraw() {
-  const calls: Array<{ type: string; size?: { width: number; height: number } }> = [];
-  const redraw: Redraw = async (_bytes, size, type) => {
-    calls.push({ type, size });
+  const calls: Array<{ type: string; size?: { width: number; height: number }; maxSide?: number }> = [];
+  const redraw: Redraw = async (_bytes, size, type, maxSide) => {
+    calls.push({ type, size, maxSide });
     return { bytes: new Uint8Array([7, 7, 7]), width: 4096, height: 2286 };
   };
   return { calls, redraw };
@@ -84,20 +94,81 @@ describe('prepareImage', () => {
   it('redraws an image larger than 4096 px, keeping JPEG as JPEG', async () => {
     const { redraw, calls } = recordingRedraw();
     const image = await prepareImage(url, { fetchImpl: fetchOf(jpeg(5504, 3072)).fetchImpl, redraw });
-    expect(calls).toEqual([{ type: 'image/jpeg', size: { width: 5504, height: 3072 } }]);
+    expect(calls).toEqual([{ type: 'image/jpeg', size: { width: 5504, height: 3072 }, maxSide: 4096 }]);
     expect(image).toMatchObject({ width: 4096, height: 2286, url });
   });
 
   it('redraws WebP as PNG', async () => {
     const { redraw, calls } = recordingRedraw();
     await prepareImage(url, { fetchImpl: fetchOf(webp).fetchImpl, redraw });
-    expect(calls).toEqual([{ type: 'image/png', size: undefined }]);
+    expect(calls).toEqual([{ type: 'image/png', size: undefined, maxSide: 4096 }]);
   });
 
   it('fails clearly when the download fails or is empty', async () => {
     await expect(prepareImage(url, { fetchImpl: fetchOf(png(1, 1), 404).fetchImpl })).rejects.toThrow('HTTP 404');
     await expect(prepareImage(url, { fetchImpl: fetchOf(new Uint8Array()).fetchImpl })).rejects.toBeInstanceOf(
       ImageError,
+    );
+    const offline = async () => {
+      throw new TypeError('Failed to fetch');
+    };
+    await expect(prepareImage(url, { fetchImpl: offline })).rejects.toThrow('It is in Recent');
+  });
+});
+
+describe('inputDataUri', () => {
+  it('sends an image within the limits as it is', async () => {
+    const bytes = png(512, 512);
+    const uri = await inputDataUri({ bytes, width: 512, height: 512 });
+    expect(uri).toBe(`data:image/png;base64,${toBase64(bytes)}`);
+  });
+
+  it('scales a large image down, trying PNG before JPEG and smaller sizes after', async () => {
+    const tried: Array<[string, number | undefined]> = [];
+    const redraw: Redraw = async (_bytes, _size, type, maxSide) => {
+      tried.push([type, maxSide]);
+      const size = type === 'image/jpeg' && (maxSide ?? 0) <= 1536 ? 10 : 5000;
+      return { bytes: new Uint8Array(size), width: maxSide ?? 0, height: maxSide ?? 0 };
+    };
+    const uri = await inputDataUri({ bytes: png(3000, 3000), width: 3000, height: 3000 }, { maxBytes: 100, redraw });
+    expect(uri.startsWith('data:image/jpeg;base64,')).toBe(true);
+    expect(tried).toEqual([
+      ['image/png', 2048],
+      ['image/jpeg', 2048],
+      ['image/png', 1536],
+      ['image/jpeg', 1536],
+    ]);
+  });
+
+  it('keeps JPEG as JPEG and gives up after several sizes', async () => {
+    const types: string[] = [];
+    const redraw: Redraw = async (_bytes, _size, type) => {
+      types.push(type);
+      return { bytes: new Uint8Array(500), width: 1, height: 1 };
+    };
+    await expect(
+      inputDataUri({ bytes: jpeg(4000, 3000), width: 4000, height: 3000 }, { maxBytes: 100, redraw }),
+    ).rejects.toThrow('too large');
+    expect(new Set(types)).toEqual(new Set(['image/jpeg']));
+  });
+
+  it('encodes base64 the way btoa would, in chunks for large inputs', () => {
+    const bytes = new Uint8Array(100_000).map((_, index) => index % 256);
+    let binary = '';
+    for (const byte of bytes) binary += String.fromCharCode(byte);
+    expect(toBase64(bytes)).toBe(btoa(binary));
+  });
+});
+
+describe('fetchSvg', () => {
+  it('returns SVG text and refuses anything else', async () => {
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg"></svg>';
+    expect(await fetchSvg('https://cdn1.wiro.ai/a.svg', async () => new Response(svg))).toBe(svg);
+    await expect(fetchSvg('https://cdn1.wiro.ai/a.svg', async () => new Response('<html>'))).rejects.toThrow(
+      'did not return an SVG',
+    );
+    await expect(fetchSvg('https://cdn1.wiro.ai/a.svg', async () => new Response('', { status: 404 }))).rejects.toThrow(
+      'HTTP 404',
     );
   });
 });

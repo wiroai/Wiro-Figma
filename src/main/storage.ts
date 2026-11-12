@@ -28,6 +28,11 @@ function text(value: unknown, max = MAX_TEXT): string | undefined {
   return typeof value === 'string' && value.length <= max ? value : undefined;
 }
 
+/** A prompt, cut to MAX_TEXT characters instead of being refused. */
+function promptText(value: unknown): string | undefined {
+  return typeof value === 'string' ? value.slice(0, MAX_TEXT) : undefined;
+}
+
 function finite(value: unknown): number | undefined {
   return typeof value === 'number' && isFinite(value) ? value : undefined;
 }
@@ -48,11 +53,32 @@ function parseScaleMode(value: unknown): ScaleMode | undefined {
   return value === 'FILL' || value === 'FIT' ? value : undefined;
 }
 
+const SLUG = /^[^/\s]+\/\S+$/;
+const KEY = /^[a-z0-9-]{1,40}$/;
+
+/** A map of short keys to short strings, such as the model or an option per action. */
+function stringMap(value: unknown, check: (entry: string) => boolean, max = 400): Record<string, string> | undefined {
+  if (!isObject(value)) return undefined;
+  const map: Record<string, string> = {};
+  for (const key of Object.keys(value).slice(0, 50)) {
+    const entry = text(value[key], max);
+    if (KEY.test(key) && entry !== undefined && check(entry)) map[key] = entry;
+  }
+  return map;
+}
+
 export function parsePreferences(value: unknown): Preferences {
   if (!isObject(value)) return {};
   const preferences: Preferences = {};
-  const model = text(value.model, 200);
-  if (model && /^[^/\s]+\/\S+$/.test(model)) preferences.model = model;
+  const models = stringMap(value.models, (slug) => SLUG.test(slug), 200) ?? {};
+  // Version 1 kept one model, for image generation.
+  const legacy = text(value.model, 200);
+  if (legacy && SLUG.test(legacy) && !models.generate) models.generate = legacy;
+  if (Object.keys(models).length > 0) preferences.models = models;
+  const options = stringMap(value.options, () => true);
+  if (options && Object.keys(options).length > 0) preferences.options = options;
+  const tab = text(value.tab, 40);
+  if (tab && KEY.test(tab)) preferences.tab = tab;
   const scaleMode = parseScaleMode(value.scaleMode);
   if (scaleMode) preferences.scaleMode = scaleMode;
   if (isObject(value.values)) {
@@ -79,10 +105,11 @@ export function parseRecent(value: unknown): RecentImage[] {
     if (!isObject(item)) continue;
     const url = text(item.url, 2000);
     const model = text(item.model, 200);
-    const prompt = text(item.prompt);
+    const prompt = promptText(item.prompt);
     const createdAt = finite(item.createdAt);
     if (!url || !isHttpsUrl(url) || !model || prompt === undefined || createdAt === undefined) continue;
     const image: RecentImage = { url, model, prompt, createdAt };
+    if (item.kind === 'svg') image.kind = 'svg';
     const taskId = text(item.taskId, 64);
     if (taskId) image.taskId = taskId;
     const width = finite(item.width);
@@ -99,11 +126,14 @@ export function parseRecent(value: unknown): RecentImage[] {
   return recent;
 }
 
-export function parsePending(value: unknown, now = Date.now()): PendingRun | null {
+/** At most this many unfinished runs are kept. */
+export const PENDING_LIMIT = 10;
+
+function parsePendingRun(value: unknown, now: number): PendingRun | null {
   if (!isObject(value)) return null;
   const tasktoken = text(value.tasktoken, 256);
   const model = text(value.model, 200);
-  const prompt = text(value.prompt);
+  const prompt = promptText(value.prompt);
   const startedAt = finite(value.startedAt);
   if (!tasktoken || !model || prompt === undefined || startedAt === undefined) return null;
   if (now - startedAt > PENDING_MAX_AGE_MS) return null;
@@ -111,6 +141,21 @@ export function parsePending(value: unknown, now = Date.now()): PendingRun | nul
   const taskId = text(value.taskId, 64);
   if (taskId) pending.taskId = taskId;
   return pending;
+}
+
+/** Runs that were going, newest first. A single run (version 1) still reads. */
+export function parsePending(value: unknown, now = Date.now()): PendingRun[] {
+  const list = Array.isArray(value) ? value : value ? [value] : [];
+  const runs: PendingRun[] = [];
+  const tokens = new Set<string>();
+  for (const item of list) {
+    const run = parsePendingRun(item, now);
+    if (!run || tokens.has(run.tasktoken)) continue;
+    tokens.add(run.tasktoken);
+    runs.push(run);
+    if (runs.length >= PENDING_LIMIT) break;
+  }
+  return runs;
 }
 
 /** The part of figma.clientStorage the plugin uses. */
@@ -152,6 +197,6 @@ export async function saveRecent(storage: Storage, value: unknown): Promise<void
 
 export async function savePending(storage: Storage, value: unknown, now = Date.now()): Promise<void> {
   const pending = parsePending(value, now);
-  if (pending) await storage.setAsync(STORAGE_KEYS.pending, pending);
+  if (pending.length > 0) await storage.setAsync(STORAGE_KEYS.pending, pending);
   else await storage.deleteAsync(STORAGE_KEYS.pending);
 }

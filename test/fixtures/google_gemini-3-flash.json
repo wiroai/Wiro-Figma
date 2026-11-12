@@ -1,0 +1,322 @@
+{
+  "slug": "google/gemini-3-flash",
+  "title": "Gemini 3 Flash",
+  "description": "Gemini 3 Flash reads text, images, audio, video and PDFs in a 1M-token context and can call your tools or return JSON. Try Gemini 3 Flash by Google on Wiro now.",
+  "categories": [
+    "partner",
+    "google",
+    "use-agent",
+    "price-list",
+    "partner-llm",
+    "nogpu-pipeline",
+    "llm-tool-call",
+    "llm-response-format"
+  ],
+  "pricing": "Set by the run when it ends: Will be calculated when the task finishes. $0.50 (text / image / video) for 1m input tokens, $1.00 (audio) for 1m input tokens. $3.0 for 1m output tokens(including thinking tokens)",
+  "estimatedCostUsd": null,
+  "pricingNotes": [
+    "Will be calculated when the task finishes. $0.50 (text / image / video) for 1m input tokens, $1.00 (audio) for 1m input tokens. $3.0 for 1m output tokens(including thinking tokens)"
+  ],
+  "parameters": [
+    {
+      "title": "",
+      "items": [
+        {
+          "id": "inputAll",
+          "type": "combinefileinput",
+          "label": "input files",
+          "required": false,
+          "placeholder": "input image/video/audio/file",
+          "note": "Optional. Multiple files separated by semicolon. Supports images, videos, and audio.",
+          "options": [],
+          "advanced": false
+        },
+        {
+          "id": "prompt",
+          "type": "textarea",
+          "label": "prompt",
+          "sample": "Tell me about Türkiye",
+          "required": true,
+          "placeholder": "prompt",
+          "note": "Required.",
+          "options": [],
+          "advanced": false
+        },
+        {
+          "id": "user_id",
+          "type": "text",
+          "label": "user ID",
+          "required": false,
+          "placeholder": "User ID",
+          "note": "Required for chat history. Numeric or string ID.",
+          "options": [],
+          "advanced": false
+        },
+        {
+          "id": "session_id",
+          "type": "text",
+          "label": "session ID",
+          "required": false,
+          "placeholder": "Session ID",
+          "note": "Required for chat history. Numeric or string ID.",
+          "options": [],
+          "advanced": false
+        },
+        {
+          "id": "systemInstructions",
+          "type": "textarea",
+          "label": "system instructions",
+          "required": false,
+          "placeholder": "System instructions",
+          "note": "Optional. System-level instructions for the model.",
+          "options": [],
+          "advanced": true
+        },
+        {
+          "id": "thinkingLevel",
+          "type": "select",
+          "label": "thinking level",
+          "default": "low",
+          "required": false,
+          "placeholder": "thinking level",
+          "note": "Optional",
+          "options": [
+            {
+              "label": "minimal",
+              "value": "minimal"
+            },
+            {
+              "label": "low",
+              "value": "low"
+            },
+            {
+              "label": "medium",
+              "value": "medium"
+            },
+            {
+              "label": "high",
+              "value": "high"
+            }
+          ],
+          "advanced": true
+        },
+        {
+          "id": "temperature",
+          "type": "float",
+          "label": "temperature",
+          "default": "1",
+          "required": false,
+          "placeholder": "temperature",
+          "note": "Optional. Controls randomness. Range: 0.0-2.0",
+          "options": [],
+          "min": 0,
+          "max": 2,
+          "step": 0.1,
+          "advanced": true
+        },
+        {
+          "id": "topP",
+          "type": "float",
+          "label": "top P",
+          "default": "0.95",
+          "required": false,
+          "placeholder": "top P",
+          "note": "Optional. Nucleus sampling. Range: 0.0-1.0",
+          "options": [],
+          "min": 0,
+          "max": 1,
+          "step": 0.05,
+          "advanced": true
+        },
+        {
+          "id": "maxOutputTokens",
+          "type": "number",
+          "label": "max output tokens",
+          "default": "65536",
+          "required": false,
+          "placeholder": "max output tokens",
+          "note": "Optional. Maximum response length. Range: 1-65536",
+          "options": [],
+          "min": 1,
+          "max": 65536,
+          "step": 1,
+          "advanced": true
+        },
+        {
+          "id": "messages",
+          "type": "json-array",
+          "label": "Messages",
+          "required": false,
+          "placeholder": "[{\"role\":\"user\",\"content\":\"What is the weather in Istanbul?\"}]",
+          "note": "Conversation messages or normalized Wiro message items. Use exactly one of messages or prompt, and clear prompt when using messages.",
+          "options": [],
+          "advanced": true,
+          "jsonSchema": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 4096,
+            "items": {
+              "type": "object"
+            }
+          }
+        },
+        {
+          "id": "tools",
+          "type": "json-array",
+          "label": "Tools",
+          "required": false,
+          "placeholder": "[{\"type\":\"function\",\"function\":{\"name\":\"get_weather\",\"description\":\"Get weather\",\"parameters\":{\"type\":\"object\",\"properties\":{\"city\":{\"type\":\"string\"}},\"required\":[\"city\"]}}}]",
+          "note": "OpenAI-style or normalized Wiro function definitions. This provider does not support custom tools.",
+          "options": [],
+          "advanced": true,
+          "jsonSchema": {
+            "type": "array",
+            "maxItems": 128,
+            "x-wiro-tool-types": ["function"],
+            "items": {
+              "type": "object",
+              "required": ["type"],
+              "properties": {
+                "type": {
+                  "enum": ["function"]
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "tool_choice",
+          "type": "json",
+          "label": "Tool Choice",
+          "required": false,
+          "placeholder": "\"auto\"",
+          "note": "Use \"auto\", \"none\", \"required\", or a named tool-choice object.",
+          "options": [],
+          "advanced": true,
+          "jsonSchema": {
+            "oneOf": [
+              {
+                "enum": ["auto", "none", "required"]
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        {
+          "id": "parallel_tool_calls",
+          "type": "checkbox",
+          "label": "Parallel Tool Calls",
+          "default": "true",
+          "required": false,
+          "placeholder": "",
+          "note": "Allow the model to return more than one tool call in a turn.",
+          "options": [],
+          "advanced": true,
+          "jsonSchema": {
+            "type": "boolean"
+          }
+        },
+        {
+          "id": "previousTaskToken",
+          "type": "text",
+          "label": "Previous Task Token",
+          "required": false,
+          "placeholder": "task-token",
+          "note": "Pass the prior Run response's socketaccesstoken. Include toolOutputs for a tool-result continuation; otherwise send exactly one new prompt or messages value.",
+          "options": [],
+          "advanced": true,
+          "jsonSchema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.:-]{1,256}$"
+          }
+        },
+        {
+          "id": "toolOutputs",
+          "type": "json-array",
+          "label": "Tool Outputs",
+          "required": false,
+          "placeholder": "[{\"call_id\":\"call_123\",\"output\":{\"temperature\":18}}]",
+          "note": "Results for calls from previousTaskToken. Each call ID must match the authenticated stored turn.",
+          "options": [],
+          "advanced": true,
+          "jsonSchema": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 128,
+            "items": {
+              "type": "object",
+              "required": ["call_id", "output"],
+              "properties": {
+                "call_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "output": {},
+                "is_error": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "id": "response_format",
+          "type": "json",
+          "label": "Response Format",
+          "required": false,
+          "placeholder": "{\"type\":\"json_schema\",\"name\":\"result\",\"schema\":{\"type\":\"object\"}}",
+          "note": "Request one of the response formats explicitly audited for this model.",
+          "options": [],
+          "advanced": true,
+          "jsonSchema": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": ["type"],
+                "properties": {
+                  "type": {
+                    "const": "text"
+                  }
+                },
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "required": ["type", "name", "schema"],
+                "properties": {
+                  "type": {
+                    "const": "json_schema"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64,
+                    "pattern": "^[A-Za-z0-9_-]+$"
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 65536
+                  },
+                  "schema": {
+                    "type": "object"
+                  },
+                  "strict": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              }
+            ],
+            "x-wiro-response-format-types": ["json_schema"],
+            "x-wiro-json-schema-strict": true
+          }
+        }
+      ]
+    }
+  ]
+}

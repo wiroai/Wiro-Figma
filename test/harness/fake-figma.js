@@ -1,12 +1,19 @@
 // A stand-in for the parts of the Figma plugin API that dist/code.js uses,
 // drawn as a simple canvas. Image rules follow figma.createImage: PNG, JPEG or
 // GIF only, at most 4096 px a side.
+//
+// Query parameters:
+//   theme=dark       Figma's dark theme colors
+//   clean=1          hide the hint, the toasts and the balance (screenshots)
+//   reset=1          clear the stored preferences, Recent and unfinished runs
+//   prefs={json}     seed the preferences
+//   recent=url,url   seed the Recent list
+//   photo=url        put this image in the "Photo" frame, for the Edit tab
 
 (async () => {
   const params = new URLSearchParams(location.search);
   const dark = params.get('theme') === 'dark';
   if (dark) document.body.classList.add('dark');
-  // ?clean=1 hides the hint and the account balance, for screenshots.
   const clean = params.get('clean') === '1';
   if (clean) document.body.classList.add('clean');
 
@@ -48,22 +55,22 @@
   let nextId = 1;
   const handlers = {};
   const emit = (event) => (handlers[event] || []).forEach((handler) => handler());
-
   const images = new Map();
+  const FONT = { family: 'Inter', style: 'Regular' };
 
   class FakeNode {
-    constructor(type, props) {
+    constructor(type, props = {}) {
       this.id = `${nextId++}:1`;
       this.type = type;
       this.name = props.name || type;
-      this.x = props.x || 0;
-      this.y = props.y || 0;
+      this._x = props.x || 0;
+      this._y = props.y || 0;
       this.width = props.width || 100;
       this.height = props.height || 100;
       this.removed = false;
       this.pluginData = {};
-      this.hasFills = type !== 'GROUP';
-      this._fills = this.hasFills ? props.fills || [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }] : undefined;
+      this.children = [];
+      this.parent = null;
       this.element = document.createElement('div');
       this.element.className = `node ${type.toLowerCase()}`;
       this.element.addEventListener('click', (event) => {
@@ -73,10 +80,13 @@
       const label = document.createElement('div');
       label.className = 'label';
       this.element.append(label);
-      world.append(this.element);
+      this.content = document.createElement('div');
+      this.content.className = 'content';
+      this.element.append(this.content);
       nodes.set(this.id, this);
       // Groups have no fills property at all, as in Figma.
-      if (this.hasFills) {
+      if (type !== 'GROUP') {
+        this._fills = props.fills || [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
         Object.defineProperty(this, 'fills', {
           enumerable: true,
           get: () => this._fills,
@@ -86,12 +96,75 @@
           },
         });
       }
+      if (type === 'TEXT') {
+        this._characters = props.characters || '';
+        this.fontName = FONT;
+        this.fontSize = props.fontSize || 32;
+        this.hasMissingFont = false;
+        this.textAutoResize = 'NONE';
+        this._fills = props.fills || [{ type: 'SOLID', color: { r: 0.1, g: 0.1, b: 0.1 } }];
+        Object.defineProperty(this, 'characters', {
+          enumerable: true,
+          get: () => this._characters,
+          set: (value) => {
+            this._characters = String(value);
+            this.render();
+          },
+        });
+      }
+      if (props.parent) props.parent.appendChild(this);
+      else world.append(this.element);
       this.render();
+    }
+    get x() {
+      return this._x;
+    }
+    set x(value) {
+      this._x = value;
+      if (this.content) this.render();
+    }
+    get y() {
+      return this._y;
+    }
+    set y(value) {
+      this._y = value;
+      if (this.content) this.render();
+    }
+    appendChild(child) {
+      child.parent = this;
+      this.children.push(child);
+      this.element.append(child.element);
+    }
+    get absoluteBoundingBox() {
+      let x = this.x;
+      let y = this.y;
+      for (let parent = this.parent; parent; parent = parent.parent) {
+        x += parent.x;
+        y += parent.y;
+      }
+      return { x, y, width: this.width, height: this.height };
+    }
+    findAllWithCriteria({ types }) {
+      const found = [];
+      const walk = (node) => {
+        for (const child of node.children) {
+          if (types.includes(child.type)) found.push(child);
+          walk(child);
+        }
+      };
+      walk(this);
+      return found;
+    }
+    getRangeAllFontNames() {
+      return [this.fontName];
     }
     resize(width, height) {
       this.width = width;
       this.height = height;
       this.render();
+    }
+    rescale(factor) {
+      this.resize(this.width * factor, this.height * factor);
     }
     setPluginData(key, value) {
       this.pluginData[key] = value;
@@ -99,16 +172,54 @@
     getPluginData(key) {
       return this.pluginData[key] || '';
     }
+    async exportAsync(settings) {
+      const scale = settings?.constraint?.type === 'SCALE' ? settings.constraint.value : 1;
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(this.width * scale));
+      canvas.height = Math.max(1, Math.round(this.height * scale));
+      const context = canvas.getContext('2d');
+      context.fillStyle = '#ffffff';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      const paint = (this._fills || [])[0];
+      if (paint && paint.type === 'IMAGE') {
+        const bitmap = await createImageBitmap(new Blob([images.get(paint.imageHash).bytes]));
+        const cover = Math.max(canvas.width / bitmap.width, canvas.height / bitmap.height);
+        const w = bitmap.width * cover;
+        const h = bitmap.height * cover;
+        context.drawImage(bitmap, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+      }
+      if (this.type === 'TEXT') {
+        context.fillStyle = '#1e1e1e';
+        context.font = `${this.fontSize * scale}px Inter, sans-serif`;
+        context.fillText(this._characters, 4, this.fontSize * scale);
+      }
+      const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+      return new Uint8Array(await blob.arrayBuffer());
+    }
     render() {
       const style = this.element.style;
       style.left = `${this.x}px`;
       style.top = `${this.y}px`;
       style.width = `${this.width}px`;
       style.height = `${this.height}px`;
-      this.element.querySelector('.label').textContent =
-        `${this.name}  ${Math.round(this.width)} × ${Math.round(this.height)}`;
+      this.element.querySelector('.label').textContent = this.parent
+        ? ''
+        : `${this.name}  ${Math.round(this.width)} × ${Math.round(this.height)}`;
       const paint = (this._fills || [])[0];
-      if (paint && paint.type === 'IMAGE') {
+      if (this.type === 'TEXT') {
+        this.content.textContent = this._characters;
+        this.content.style.fontSize = `${this.fontSize}px`;
+        style.backgroundImage = '';
+        style.background = 'transparent';
+        if (paint && paint.type === 'IMAGE') {
+          this.content.style.backgroundImage = `url("${images.get(paint.imageHash).url}")`;
+          this.content.style.backgroundSize = 'cover';
+          this.content.style.webkitBackgroundClip = 'text';
+          this.content.style.color = 'transparent';
+        }
+      } else if (this.svgUrl) {
+        style.background = `center / contain no-repeat url("${this.svgUrl}") #ffffff`;
+      } else if (paint && paint.type === 'IMAGE') {
         style.backgroundImage = `url("${images.get(paint.imageHash).url}")`;
         style.backgroundSize = paint.scaleMode === 'FIT' ? 'contain' : 'cover';
         style.backgroundColor = paint.scaleMode === 'FIT' ? '#f0f0f0' : '';
@@ -124,7 +235,7 @@
     type: 'PAGE',
     name: 'Page 1',
     get children() {
-      return [...nodes.values()];
+      return [...nodes.values()].filter((node) => !node.parent);
     },
     get selection() {
       return selection;
@@ -135,7 +246,7 @@
       emit('selectionchange');
     },
     appendChild(node) {
-      world.append(node.element);
+      if (!node.parent) world.append(node.element);
     },
   };
 
@@ -151,6 +262,7 @@
     let right = 0;
     let bottom = 0;
     for (const node of nodes.values()) {
+      if (node.parent) continue;
       right = Math.max(right, node.x + node.width);
       bottom = Math.max(bottom, node.y + node.height);
     }
@@ -166,6 +278,28 @@
   new FakeNode('FRAME', { name: 'Hero', x: 0, y: 0, width: 1440, height: 810 });
   new FakeNode('FRAME', { name: 'Post', x: 1560, y: 0, width: 1080, height: 1350 });
   new FakeNode('ELLIPSE', { name: 'Avatar', x: 2760, y: 0, width: 480, height: 480 });
+  const photo = new FakeNode('FRAME', { name: 'Photo', x: 0, y: 960, width: 800, height: 800 });
+  const card = new FakeNode('FRAME', { name: 'Card', x: 960, y: 1500, width: 1200, height: 420 });
+  new FakeNode('TEXT', {
+    name: 'Title',
+    parent: card,
+    x: 40,
+    y: 40,
+    width: 1100,
+    height: 80,
+    characters: 'Plan your next trip in minutes',
+    fontSize: 56,
+  });
+  new FakeNode('TEXT', {
+    name: 'Body',
+    parent: card,
+    x: 40,
+    y: 160,
+    width: 1100,
+    height: 200,
+    characters: 'Pick a city, set your dates and get a day by day plan with places to eat, see and stay.',
+    fontSize: 32,
+  });
   if (!clean) new FakeNode('GROUP', { name: 'Logo group', x: 2760, y: 620, width: 480, height: 200 });
 
   // ---- Images --------------------------------------------------------------
@@ -195,6 +329,15 @@
     return null;
   }
 
+  function addImage(bytes) {
+    const info = imageInfo(bytes);
+    if (!info) throw new Error('Image type is unsupported');
+    if (info.width > 4096 || info.height > 4096) throw new Error('Image is too large');
+    const hash = `hash-${images.size + 1}`;
+    images.set(hash, { url: URL.createObjectURL(new Blob([bytes], { type: info.type })), ...info, bytes });
+    return hash;
+  }
+
   // ---- Plugin API ------------------------------------------------------------
 
   // Client storage survives a reload (like Figma's), in this page's
@@ -220,20 +363,24 @@
   };
   const credentials = await fetch('/credentials.json').then((response) => response.json());
   if (credentials) storage.set('credentials', credentials);
-  // ?prefs={json} seeds the saved preferences (model, settings per model).
   if (params.get('prefs')) storage.set('preferences', JSON.parse(params.get('prefs')));
-  // ?recent=url,url seeds the Recent list, for trying placement without a new run.
   const seeded = (params.get('recent') || '').split(',').filter((url) => url.startsWith('https://'));
   if (seeded.length > 0) {
     storage.set(
       'recent',
       seeded.map((url, index) => ({
         url,
+        kind: /\.svg(\?|$)/.test(url) ? 'svg' : undefined,
         model: 'seeded/image',
         prompt: `Seeded image ${index + 1}`,
         createdAt: Date.now(),
       })),
     );
+  }
+  const photoUrl = params.get('photo');
+  if (photoUrl) {
+    const bytes = new Uint8Array(await (await fetch(photoUrl)).arrayBuffer());
+    photo.fills = [{ type: 'IMAGE', imageHash: addImage(bytes), scaleMode: 'FILL' }];
   }
   const manifest = await fetch('/manifest.json').then((response) => response.json());
 
@@ -248,6 +395,7 @@
   }
 
   window.figma = {
+    mixed: Symbol('mixed'),
     currentPage: page,
     clientStorage: {
       async getAsync(key) {
@@ -265,7 +413,7 @@
     },
     viewport: {
       get center() {
-        return { x: 1600, y: 2100 };
+        return { x: 1600, y: 2400 };
       },
       scrollAndZoomIntoView(list) {
         list[0]?.element.scrollIntoView({ block: 'center', inline: 'center' });
@@ -304,16 +452,16 @@
       requestAnimationFrame(fitWorld);
     },
     createImage(bytes) {
-      const info = imageInfo(bytes);
-      if (!info) throw new Error('Image type is unsupported');
-      if (info.width > 4096 || info.height > 4096) throw new Error('Image is too large');
-      const hash = `hash-${images.size + 1}`;
-      images.set(hash, {
-        url: URL.createObjectURL(new Blob([bytes], { type: info.type })),
-        ...info,
-        bytes: bytes.length,
-      });
-      return { hash };
+      return { hash: addImage(bytes) };
+    },
+    getImageByHash(hash) {
+      const image = images.get(hash);
+      if (!image) return null;
+      return {
+        hash,
+        getBytesAsync: async () => image.bytes,
+        getSizeAsync: async () => ({ width: image.width, height: image.height }),
+      };
     },
     async getNodeByIdAsync(id) {
       return nodes.get(id) || null;
@@ -321,6 +469,23 @@
     createRectangle() {
       return new FakeNode('RECTANGLE', { width: 100, height: 100 });
     },
+    createText() {
+      return new FakeNode('TEXT', { width: 400, height: 40, fontSize: 16 });
+    },
+    createNodeFromSvg(svg) {
+      if (!/<svg[\s>]/i.test(svg)) throw new Error('Invalid SVG');
+      const doc = new DOMParser().parseFromString(svg, 'image/svg+xml');
+      const root = doc.documentElement;
+      const box = (root.getAttribute('viewBox') || '').split(/[\s,]+/).map(Number);
+      const width = Number.parseFloat(root.getAttribute('width')) || box[2] || 512;
+      const height = Number.parseFloat(root.getAttribute('height')) || box[3] || 512;
+      const node = new FakeNode('FRAME', { name: 'svg', width, height });
+      node.svgUrl = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+      node.svgLength = svg.length;
+      node.render();
+      return node;
+    },
+    async loadFontAsync() {},
     commitUndo() {},
     notify(message, options) {
       toast(message, options && options.error);
@@ -339,6 +504,13 @@
     if (message && window.figma.ui.onmessage) window.figma.ui.onmessage(message);
   });
 
+  function imageSummary(node) {
+    const paint = node.fills && node.fills[0];
+    if (!paint || paint.type !== 'IMAGE') return null;
+    const image = images.get(paint.imageHash);
+    return { type: image.type, width: image.width, height: image.height, bytes: image.bytes.length };
+  }
+
   // For checks from the browser console or automation.
   window.harness = {
     select(names) {
@@ -349,13 +521,15 @@
         id: node.id,
         type: node.type,
         name: node.name,
+        parent: node.parent ? node.parent.name : null,
         x: node.x,
         y: node.y,
         width: node.width,
         height: node.height,
+        characters: node.type === 'TEXT' ? node.characters : undefined,
         fills: node.fills,
-        image:
-          node.fills && node.fills[0] && node.fills[0].type === 'IMAGE' ? images.get(node.fills[0].imageHash) : null,
+        svg: node.svgLength || 0,
+        image: imageSummary(node),
         pluginData: node.pluginData,
       }));
     },

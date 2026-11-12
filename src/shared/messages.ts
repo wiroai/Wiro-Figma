@@ -1,6 +1,6 @@
 // Messages between the plugin's main thread (src/code.ts) and its UI iframe
 // (src/ui). The main thread owns the document and figma.clientStorage; the UI
-// owns the network: it talks to Wiro AI and downloads the finished images.
+// owns the network: it talks to Wiro AI and downloads the results.
 
 export type ScaleMode = 'FILL' | 'FIT';
 
@@ -11,16 +11,22 @@ export interface Credentials {
 }
 
 export interface Preferences {
-  /** The model slug, `owner/project`. */
-  model?: string;
+  /** The model chosen for each action, by action id. */
+  models?: Record<string, string>;
   scaleMode?: ScaleMode;
   /** Settings the user changed, per model slug. */
   values?: Record<string, Record<string, string>>;
+  /** Small choices per action: target language, style, product, placement. */
+  options?: Record<string, string>;
+  /** The tab that was open last. */
+  tab?: string;
 }
 
 /** A finished image, kept so it can be placed again without a new run. */
 export interface RecentImage {
   url: string;
+  /** "svg" for vector results, which go back on the canvas as vector layers. */
+  kind?: 'svg';
   model: string;
   prompt: string;
   taskId?: string;
@@ -30,7 +36,7 @@ export interface RecentImage {
   createdAt: number;
 }
 
-/** A run that was still going when the plugin last closed. */
+/** A run that is going, kept until it ends so it can be picked up if the plugin closes. */
 export interface PendingRun {
   tasktoken: string;
   taskId?: string;
@@ -46,6 +52,8 @@ export interface SelectionTarget {
   type: string;
   width: number;
   height: number;
+  /** The layer shows an image fill, so image actions can read the image itself. */
+  hasImage: boolean;
 }
 
 export interface SelectionInfo {
@@ -53,6 +61,8 @@ export interface SelectionInfo {
   targets: SelectionTarget[];
   /** Selected layers that do not, such as groups, lines and slices. */
   skipped: number;
+  /** Text layers in the selection, counting those inside selected frames. */
+  texts: number;
 }
 
 /** An image ready for figma.createImage: PNG, JPEG or GIF, at most 4096 px a side. */
@@ -64,16 +74,21 @@ export interface ImagePayload {
   url: string;
 }
 
-export interface PlaceRequest {
-  requestId: number;
-  images: ImagePayload[];
-  /** Layers to fill. When empty, each image goes into a new rectangle. */
-  targetIds: string[];
-  scaleMode: ScaleMode;
-  /** The name of new rectangles. */
+/** A selected layer as an image, for actions that send it to a model. */
+export interface ExportedImage {
+  id: string;
   name: string;
-  model: string;
-  taskId?: string;
+  bytes: Uint8Array;
+  width: number;
+  height: number;
+  /** "fill": the layer's own image at full size; "render": the layer drawn as PNG. */
+  source: 'fill' | 'render';
+}
+
+export interface TextItem {
+  id: string;
+  name: string;
+  characters: string;
 }
 
 export interface PlaceResult {
@@ -83,14 +98,55 @@ export interface PlaceResult {
   missing: number;
 }
 
+export interface SetTextResult {
+  updated: number;
+  failed: Array<{ id: string; name: string; reason: string }>;
+}
+
+/**
+ * Requests the UI sends and the main thread answers with a reply:
+ * - place: put images into layers ("fill") or in new rectangles; "beside"
+ *   puts the new rectangles to the right of the anchor layer.
+ * - export: the selected layers as images.
+ * - read-text / set-text: the text layers in the selection.
+ * - place-svg: an SVG as vector layers.
+ * - insert-text: a new text layer.
+ */
+export type Request =
+  | {
+      kind: 'place';
+      images: ImagePayload[];
+      targetIds: string[];
+      mode: 'fill' | 'beside';
+      anchorId?: string;
+      scaleMode: ScaleMode;
+      name: string;
+      model: string;
+      taskId?: string;
+    }
+  | { kind: 'export'; maxSide: number; limit: number }
+  | { kind: 'read-text'; limit: number }
+  | { kind: 'set-text'; items: Array<{ id: string; text: string }> }
+  | { kind: 'place-svg'; svg: string; name: string; anchorId?: string; model: string; taskId?: string }
+  | { kind: 'insert-text'; text: string; name: string; anchorId?: string };
+
+export interface RequestResults {
+  place: PlaceResult;
+  export: ExportedImage[];
+  'read-text': TextItem[];
+  'set-text': SetTextResult;
+  'place-svg': { created: number };
+  'insert-text': { created: number };
+}
+
 export type UiToMain =
   | { type: 'ready' }
   | { type: 'save-credentials'; credentials: Credentials }
   | { type: 'clear-credentials' }
   | { type: 'save-preferences'; preferences: Preferences }
   | { type: 'save-recent'; recent: RecentImage[] }
-  | { type: 'save-pending'; pending: PendingRun | null }
-  | ({ type: 'place' } & PlaceRequest)
+  | { type: 'save-pending'; pending: PendingRun[] }
+  | { type: 'request'; requestId: number; request: Request }
   | { type: 'open-url'; url: string }
   | { type: 'notify'; message: string; error?: boolean };
 
@@ -98,11 +154,11 @@ export interface InitState {
   credentials: Credentials | null;
   preferences: Preferences;
   recent: RecentImage[];
-  pending: PendingRun | null;
+  pending: PendingRun[];
   selection: SelectionInfo;
 }
 
 export type MainToUi =
   | ({ type: 'init' } & InitState)
   | { type: 'selection'; selection: SelectionInfo }
-  | { type: 'placed'; requestId: number; result?: PlaceResult; error?: string };
+  | { type: 'reply'; requestId: number; result?: unknown; error?: string };

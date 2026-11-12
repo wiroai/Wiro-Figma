@@ -69,6 +69,17 @@ export function SettingField(props: {
         onInput={(event) => onChange(event.currentTarget.value)}
       />
     );
+  } else if (kind === 'json') {
+    control = (
+      <textarea
+        id={id}
+        rows={3}
+        class="mono"
+        value={value ?? ''}
+        placeholder={param.placeholder || 'JSON'}
+        onInput={(event) => onChange(event.currentTarget.value)}
+      />
+    );
   } else if (kind === 'textarea') {
     control = (
       <textarea

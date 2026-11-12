@@ -92,8 +92,9 @@ export function describeError(error: unknown): ErrorView {
     return { message, link: { url: BILLING_URL, label: 'Add funds' } };
   }
   if (error instanceof WiroToolError || error instanceof McpError) return { message };
-  if (error instanceof TypeError) {
+  if (error instanceof TypeError && /fetch|network|load failed/i.test(message)) {
     return { message: 'Wiro AI could not be reached. Check your connection and try again.' };
   }
+  if (error instanceof TypeError || error instanceof RangeError) return { message: `Something went wrong: ${message}` };
   return { message };
 }

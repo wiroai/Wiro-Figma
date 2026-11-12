@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { AuthError, McpError, type McpClient, type ToolResult } from '../../src/ui/mcp';
 import type { TaskResult } from '../../src/ui/types';
-import { cleanToolText, toolError, WiroApi, WiroToolError } from '../../src/ui/wiro';
+import { cleanToolText, toolError, WaitError, WiroApi, WiroToolError } from '../../src/ui/wiro';
 
 type Script = Array<ToolResult<unknown> | Error>;
 
@@ -29,6 +29,8 @@ function task(state: TaskResult['state'], extra: Partial<TaskResult> = {}): Tool
   };
 }
 
+const toolFailure = (text: string): ToolResult<unknown> => ({ text, isError: true });
+const ok: ToolResult<unknown> = { structured: {}, text: '', isError: false };
 const noPause = async () => undefined;
 
 describe('WiroApi.runToEnd', () => {
@@ -47,10 +49,7 @@ describe('WiroApi.runToEnd', () => {
     const result = await new WiroApi(mcp, noPause).runToEnd(
       'm/x',
       { prompt: 'p' },
-      {
-        onStarted: (started) => (startedToken = started.task.token),
-        onUpdate: (update) => seen.push(update.state),
-      },
+      { onStarted: (started) => (startedToken = started.task.token), onUpdate: (update) => seen.push(update.state) },
     );
     expect(result.state).toBe('completed');
     expect(startedToken).toBe('tok');
@@ -60,33 +59,47 @@ describe('WiroApi.runToEnd', () => {
     expect(calls[1]!.args).toEqual({ tasktoken: 'tok', timeout_seconds: 45 });
   });
 
-  it('tries a failed wait again and never sends the run twice', async () => {
+  it('tries failed waits again, server-side failures too, and never sends the run twice', async () => {
     const { mcp, calls } = fakeMcp({
       run_model: [task('submitted')],
-      wait_for_task: [new TypeError('Failed to fetch'), new McpError('HTTP 502', 502), task('completed')],
+      wait_for_task: [
+        new TypeError('Failed to fetch'),
+        new McpError('HTTP 502', 502),
+        toolFailure(
+          '## Task Status Error\n\nStatus checks failed. **Task Token:** tok. Retry `wait_for_task` with the same identifier.',
+        ),
+        task('completed'),
+      ],
     });
     const result = await new WiroApi(mcp, noPause).runToEnd('m/x', {});
     expect(result.state).toBe('completed');
     expect(calls.filter((call) => call.name === 'run_model')).toHaveLength(1);
-    expect(calls.filter((call) => call.name === 'wait_for_task')).toHaveLength(3);
+    expect(calls.filter((call) => call.name === 'wait_for_task')).toHaveLength(4);
   });
 
-  it('gives up after repeated network failures', async () => {
-    const failures = Array.from({ length: 6 }, () => new TypeError('Failed to fetch'));
+  it('stops waiting after repeated failures and keeps the token', async () => {
+    const failures = Array.from({ length: 7 }, () => new TypeError('Failed to fetch'));
     const { mcp, calls } = fakeMcp({ run_model: [task('submitted')], wait_for_task: failures });
-    await expect(new WiroApi(mcp, noPause).runToEnd('m/x', {})).rejects.toThrow('Failed to fetch');
+    const error = await new WiroApi(mcp, noPause).runToEnd('m/x', {}).catch((caught: unknown) => caught);
+    expect(error).toBeInstanceOf(WaitError);
+    expect((error as WaitError).tasktoken).toBe('tok');
     expect(calls.filter((call) => call.name === 'run_model')).toHaveLength(1);
   });
 
-  it('stops the task on Wiro when the run is cancelled', async () => {
-    const controller = new AbortController();
-    const { mcp, calls } = fakeMcp({
+  it('gives up at once when the task is not found or the key is refused', async () => {
+    const lost = fakeMcp({
       run_model: [task('submitted')],
-      wait_for_task: [task('running')],
-      kill_task: [{ structured: {}, text: '', isError: false }],
+      wait_for_task: [toolFailure('## Error\n\nTask not found.')],
     });
-    const api = new WiroApi(mcp, noPause);
-    const pending = api.runToEnd(
+    await expect(new WiroApi(lost.mcp, noPause).runToEnd('m/x', {})).rejects.toBeInstanceOf(WiroToolError);
+    const refused = fakeMcp({ run_model: [task('submitted')], wait_for_task: [new AuthError()] });
+    await expect(new WiroApi(refused.mcp, noPause).runToEnd('m/x', {})).rejects.toBeInstanceOf(AuthError);
+  });
+
+  it('leaves stopping to stop() when the wait is aborted', async () => {
+    const controller = new AbortController();
+    const { mcp, calls } = fakeMcp({ run_model: [task('submitted')], wait_for_task: [task('running')] });
+    const pending = new WiroApi(mcp, noPause).runToEnd(
       'm/x',
       {},
       {
@@ -97,56 +110,60 @@ describe('WiroApi.runToEnd', () => {
       },
     );
     await expect(pending).rejects.toMatchObject({ name: 'AbortError' });
-    expect(calls.map((call) => call.name)).toEqual(['run_model', 'wait_for_task', 'kill_task']);
-    expect(calls[2]!.args).toEqual({ tasktoken: 'tok' });
+    expect(calls.map((call) => call.name)).toEqual(['run_model', 'wait_for_task']);
   });
 
-  it('kills a task that was cancelled while it was being started', async () => {
-    const controller = new AbortController();
-    controller.abort();
-    const { mcp, calls } = fakeMcp({
-      run_model: [task('submitted')],
-      kill_task: [{ structured: {}, text: '', isError: false }],
-    });
-    await expect(new WiroApi(mcp, noPause).runToEnd('m/x', {}, { signal: controller.signal })).rejects.toMatchObject({
-      name: 'AbortError',
-    });
-    expect(calls.map((call) => call.name)).toEqual(['run_model', 'kill_task']);
-  });
-
-  it('fails when the task has no token', async () => {
+  it('fails clearly when the task has no token', async () => {
     const { mcp } = fakeMcp({
       run_model: [{ structured: { state: 'submitted', task: { id: '9' }, outputs: [] }, text: '', isError: false }],
     });
     await expect(new WiroApi(mcp, noPause).runToEnd('m/x', {})).rejects.toThrow('task 9');
   });
+});
 
-  it('turns tool errors into readable errors', async () => {
-    const { mcp } = fakeMcp({
-      run_model: [{ text: '## Error\n\nFailed to run model: Request parameter [ratio] required', isError: true }],
-    });
-    await expect(new WiroApi(mcp, noPause).runToEnd('m/x', {})).rejects.toThrow(
-      'Failed to run model: Request parameter [ratio] required',
-    );
+describe('WiroApi.stop', () => {
+  it('stops a task', async () => {
+    const { mcp, calls } = fakeMcp({ kill_task: [ok] });
+    expect(await new WiroApi(mcp).stop('tok')).toEqual({ stopped: true });
+    expect(calls).toEqual([{ name: 'kill_task', args: { tasktoken: 'tok' } }]);
+  });
+
+  it('returns the result of a task that had already finished', async () => {
+    const { mcp } = fakeMcp({ kill_task: [toolFailure('## Error\n\nProcess ended')], get_task: [task('completed')] });
+    const outcome = await new WiroApi(mcp).stop('tok');
+    expect(outcome).toMatchObject({ stopped: false, result: { state: 'completed' } });
+  });
+
+  it('counts a task that failed or was cancelled anyway as stopped, and says when it cannot tell', async () => {
+    const failed = fakeMcp({ kill_task: [new TypeError('Failed to fetch')], get_task: [task('cancelled')] });
+    expect(await new WiroApi(failed.mcp).stop('tok')).toEqual({ stopped: true });
+    const unknown = fakeMcp({ kill_task: [new TypeError('x')], get_task: [new TypeError('y')] });
+    expect(await new WiroApi(unknown.mcp).stop('tok')).toEqual({ stopped: false });
   });
 });
 
-describe('toolError', () => {
+describe('tool errors', () => {
   it('recognises a refused key and a missing secret', () => {
     expect(toolError('## Error\n\nWiro API error 401: Project authorization is not founded.')).toBeInstanceOf(
       AuthError,
     );
     const secret = toolError(
-      '## Error\n\nThis project uses signature-based auth. Enter API_KEY:API_SECRET (the key and secret joined with a colon) as the API key.',
+      '## Error\n\nThis project uses signature-based auth. Enter API_KEY:API_SECRET as the API key.',
     );
     expect(secret).toBeInstanceOf(AuthError);
     expect(secret.message).toMatch(/API secret/);
     expect(toolError('## Error\n\nInsufficient balance')).toBeInstanceOf(WiroToolError);
   });
 
-  it('strips the Markdown heading', () => {
+  it('keeps the message for people and drops lines meant for AI agents', () => {
     expect(cleanToolText('## Error\n\nSomething')).toBe('Something');
+    expect(
+      cleanToolText(
+        '## Error\n\nThe task was created (task ID 5), but its token did not come back.\nDo not run the model again: read the task with get_task and taskid "5".',
+      ),
+    ).toBe('The task was created (task ID 5), but its token did not come back.');
     expect(cleanToolText('')).toBe('Wiro AI could not do that.');
+    expect(cleanToolText(`## Error\n\n${'x'.repeat(600)}`)).toHaveLength(400);
   });
 });
 
@@ -162,16 +179,24 @@ describe('WiroApi reads', () => {
     });
   });
 
-  it('returns the model of get_model_schema', async () => {
-    const { mcp } = fakeMcp({
+  it('returns the schema with its price text, and the task list', async () => {
+    const { mcp, calls } = fakeMcp({
       get_model_schema: [
         {
           structured: { model: { slug: 'a/b', title: 'B', categories: [], parameters: [] } },
-          text: '',
+          text: '### Pricing',
           isError: false,
         },
       ],
+      list_tasks: [
+        { structured: { tasks: [{ state: 'completed', task: { id: '1' }, outputs: [] }] }, text: '', isError: false },
+      ],
     });
-    expect((await new WiroApi(mcp).getModel('a/b')).slug).toBe('a/b');
+    const api = new WiroApi(mcp);
+    const detail = await api.getModel('a/b');
+    expect(detail.model.slug).toBe('a/b');
+    expect(detail.text).toBe('### Pricing');
+    expect(await api.listTasks(5)).toEqual([{ state: 'completed', task: { id: '1' }, outputs: [] }]);
+    expect(calls[1]).toEqual({ name: 'list_tasks', args: { limit: 5 } });
   });
 });

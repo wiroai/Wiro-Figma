@@ -1,0 +1,34 @@
+{
+  "slug": "briaai/rmbg-2-0",
+  "title": "RMBG 2.0 Image Background Removal (BRIA AI)",
+  "description": "RMBG 2.0 removes image backgrounds with 256-level alpha mattes. Great for eCommerce cutouts and safe editing. Try RMBG 2.0 by BRIA AI on Wiro now.",
+  "categories": [
+    "image-to-image",
+    "quick-showcase",
+    "use-agent",
+    "wiroEcommerce",
+    "persistent",
+    "compare-landscape",
+    "background-removal"
+  ],
+  "pricing": "~$0.001735 per run (estimated)",
+  "estimatedCostUsd": 0.0017349220489977727,
+  "parameters": [
+    {
+      "title": "",
+      "items": [
+        {
+          "id": "inputImage",
+          "type": "combinefileinput",
+          "label": "Input Image",
+          "sample": "https://cdn.wiro.ai/uploads/sampleinputs/briaai-rembg-2-input-4.jpg",
+          "required": true,
+          "placeholder": "Input Image",
+          "note": "Choose images for background removal (max 30).",
+          "options": [],
+          "advanced": false
+        }
+      ]
+    }
+  ]
+}

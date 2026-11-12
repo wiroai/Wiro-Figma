@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { CloseIcon, SearchIcon } from './icons';
 import { shortPricing } from './format';
-import { isFeatured, searchModels } from './models';
+import { searchModels } from './models';
 import type { ModelSummary } from './types';
 
 // The model list: featured models first, a search box, owner/slug on top and
@@ -9,6 +9,7 @@ import type { ModelSummary } from './types';
 
 export function ModelPicker(props: {
   models: ModelSummary[] | null;
+  featured: readonly string[];
   error?: string;
   selected: string;
   onSelect: (slug: string) => void;
@@ -25,6 +26,7 @@ export function ModelPicker(props: {
     return trimmed ? searchModels(models, trimmed) : models;
   }, [props.models, query]);
 
+  const isFeatured = (slug: string) => props.featured.includes(slug);
   const featured = query.trim() ? [] : shown.filter((model) => isFeatured(model.slug));
   const others = query.trim() ? shown : shown.filter((model) => !isFeatured(model.slug));
 
@@ -53,7 +55,7 @@ export function ModelPicker(props: {
           <input
             ref={input}
             type="search"
-            placeholder="Search image models"
+            placeholder="Search models"
             value={query}
             onInput={(event) => setQuery(event.currentTarget.value)}
             onKeyDown={(event) => {
@@ -83,7 +85,9 @@ export function ModelPicker(props: {
         )}
         {others.length > 0 && (
           <>
-            <div class="section-label">{query.trim() ? `${others.length} found` : 'All image models'}</div>
+            <div class="section-label">
+              {query.trim() ? `${others.length} found` : featured.length > 0 ? 'More models' : 'Models'}
+            </div>
             <ul class="model-list">{others.map(row)}</ul>
           </>
         )}

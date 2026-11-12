@@ -15,5 +15,12 @@
     "noEmit": true,
     "types": []
   },
-  "include": ["test/ui/**/*.ts", "src/ui/**/*.ts", "src/ui/**/*.tsx", "src/ui/**/*.d.ts", "src/shared/**/*.ts"]
+  "include": [
+    "test/ui/**/*.ts",
+    "test/live/**/*.ts",
+    "src/ui/**/*.ts",
+    "src/ui/**/*.tsx",
+    "src/ui/**/*.d.ts",
+    "src/shared/**/*.ts"
+  ]
 }

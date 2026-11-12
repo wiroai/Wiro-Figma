@@ -1,0 +1,143 @@
+{
+  "slug": "xinntao/real-esrgan",
+  "title": "Face Enhancement",
+  "description": "Upscale blurry or JPEG-damaged photos 2x or 4x with a GAN trained on synthetic damage, and restore faces with GFPGAN. Try Real-ESRGAN by xinntao on Wiro now.",
+  "categories": [
+    "image-to-image",
+    "real-esrgan",
+    "restoration",
+    "quick-showcase",
+    "compare-landscape",
+    "persistent",
+    "upscale"
+  ],
+  "pricing": "~$0.02182 per run (estimated)",
+  "estimatedCostUsd": 0.021820168954593454,
+  "parameters": [
+    {
+      "title": "",
+      "items": [
+        {
+          "id": "inputImage",
+          "type": "combinefileinput",
+          "label": "Input Image",
+          "sample": "https://cdn.wiro.ai/uploads/sampleinputs/xinntao-real-esrgan-sampleinput-1.png",
+          "required": true,
+          "placeholder": "Input Image",
+          "note": "input-image-help",
+          "options": [],
+          "advanced": false
+        },
+        {
+          "id": "modelName",
+          "type": "select",
+          "label": "model-name",
+          "sample": "RealESRGAN_x4plus",
+          "required": true,
+          "placeholder": "model-name",
+          "note": "model-name-help",
+          "options": [
+            {
+              "label": "RealESRGAN_x4plus",
+              "value": "RealESRGAN_x4plus"
+            },
+            {
+              "label": "RealESRNet_x4plus",
+              "value": "RealESRNet_x4plus"
+            },
+            {
+              "label": "RealESRGAN_x2plus",
+              "value": "RealESRGAN_x2plus"
+            },
+            {
+              "label": "realesr-general-wdn-x4v3",
+              "value": "realesr-general-wdn-x4v3"
+            }
+          ],
+          "advanced": false
+        },
+        {
+          "id": "outscale",
+          "type": "float",
+          "label": "outscale",
+          "default": "2.0",
+          "required": false,
+          "placeholder": "outscale",
+          "note": "outscale-help",
+          "options": [],
+          "min": 1,
+          "max": 10,
+          "step": 0.5,
+          "advanced": false
+        },
+        {
+          "id": "faceEnhance",
+          "type": "checkbox",
+          "label": "face-enhance",
+          "default": "true",
+          "required": false,
+          "placeholder": "face-enhance",
+          "note": "face-enhance-help",
+          "options": [],
+          "advanced": false
+        },
+        {
+          "id": "tile",
+          "type": "number",
+          "label": "tile",
+          "default": "0",
+          "required": false,
+          "placeholder": "tile",
+          "note": "tile-help",
+          "options": [],
+          "min": 0,
+          "max": 20,
+          "step": 1,
+          "advanced": true
+        },
+        {
+          "id": "tilePad",
+          "type": "number",
+          "label": "tile-pad",
+          "default": "10",
+          "required": false,
+          "placeholder": "tile-pad",
+          "note": "tile-pad-help",
+          "options": [],
+          "min": 0,
+          "max": 20,
+          "step": 1,
+          "advanced": true
+        },
+        {
+          "id": "prePad",
+          "type": "number",
+          "label": "pre-pad",
+          "default": "0",
+          "required": false,
+          "placeholder": "pre-pad",
+          "note": "pre-pad-help",
+          "options": [],
+          "min": 0,
+          "max": 20,
+          "step": 1,
+          "advanced": true
+        },
+        {
+          "id": "denoiseStrength",
+          "type": "float",
+          "label": "denoise-strength",
+          "default": "0.5",
+          "required": false,
+          "placeholder": "denoise-strength",
+          "note": "denoise-strength-help",
+          "options": [],
+          "min": 0,
+          "max": 1,
+          "step": 0.1,
+          "advanced": true
+        }
+      ]
+    }
+  ]
+}
