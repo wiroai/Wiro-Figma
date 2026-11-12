@@ -1,0 +1,161 @@
+{
+  "slug": "bytedance/seedream-v4-5",
+  "title": "Seedream 4.5",
+  "description": "Seedream 4.5 API for 2K and 4K text-to-image and editing with up to 14 reference images and matched image sets. Try Seedream 4.5 by ByteDance on Wiro now.",
+  "categories": [
+    "partner",
+    "ByteDance",
+    "image-to-image",
+    "text-to-image",
+    "quick-showcase",
+    "price-list",
+    "nogpu-pipeline",
+    "image-editing"
+  ],
+  "pricing": "$0.04 / per output",
+  "estimatedCostUsd": null,
+  "parameters": [
+    {
+      "title": "",
+      "items": [
+        {
+          "id": "inputImage",
+          "type": "combinefileinput",
+          "label": "input image",
+          "sample": "[\"https://cdn.wiro.ai/uploads/sampleinputs/bytedance-seedream-v4-5-input-2-1.jpg\",\"https://cdn.wiro.ai/uploads/sampleinputs/bytedance-seedream-v4-5-input-2-2.jpg\"]",
+          "required": false,
+          "placeholder": "input image",
+          "note": "Optional list of input image URL(s) and/or file(s) for creating, editing or combining images",
+          "options": [],
+          "advanced": false
+        },
+        {
+          "id": "prompt",
+          "type": "textarea",
+          "label": "Prompt",
+          "sample": "Replace the clothing in image 1 with the outfit from image 2.",
+          "required": true,
+          "placeholder": "Prompt",
+          "note": "Please provide how many images you want to generate in the prompt. Edit max images according to it.",
+          "options": [],
+          "advanced": false
+        },
+        {
+          "id": "resolution",
+          "type": "select",
+          "label": "Resolution",
+          "required": false,
+          "placeholder": "Resolution",
+          "note": "Optional for i2i. Required for t2i. If image is provided it will get the first images dimensions and calculate it according to 3686400, 16777216 these pixel counts, if lower it will be scaled up, if higher it will be scaled down by the given images ratio.",
+          "options": [
+            {
+              "label": "auto",
+              "value": ""
+            },
+            {
+              "label": "2k",
+              "value": "2k"
+            },
+            {
+              "label": "4k",
+              "value": "4k"
+            }
+          ],
+          "advanced": true
+        },
+        {
+          "id": "aspectRatio",
+          "type": "select",
+          "label": "Aspect Ratio",
+          "required": false,
+          "placeholder": "Aspect Ratio",
+          "note": "Optional for i2i, Required for t2i. If image(s) provided it will get the image/first image ratio.",
+          "options": [
+            {
+              "label": "auto",
+              "value": ""
+            },
+            {
+              "label": "1:1 (2k: 1920x1920) (4k: 2880x2880)",
+              "value": "1:1"
+            },
+            {
+              "label": "2:3 (2k: 1568x2352) (4k: 2349x3523)",
+              "value": "2:3"
+            },
+            {
+              "label": "3:2 (2k: 2352x1568) (4k: 3523x2349)",
+              "value": "3:2"
+            },
+            {
+              "label": "3:4 (2k: 1664x2218) (4k: 2496x3328)",
+              "value": "3:4"
+            },
+            {
+              "label": "4:3 (2k: 2218x1664) (4k: 3328x2496)",
+              "value": "4:3"
+            },
+            {
+              "label": "4:5 (2k: 1720x2150) (4k: 2571x3213)",
+              "value": "4:5"
+            },
+            {
+              "label": "5:4 (2k: 2150x1720) (4k: 3213x2571)",
+              "value": "5:4"
+            },
+            {
+              "label": "16:9 (2k: 2560x1440) (4k: 3840x2160)",
+              "value": "16:9"
+            },
+            {
+              "label": "9:16 (2k: 1440x2560) (4k: 2160x3840)",
+              "value": "9:16"
+            },
+            {
+              "label": "21:9 (2k: 2940x1260) (4k: 4176x1789)",
+              "value": "21:9"
+            },
+            {
+              "label": "9:21 (2k: 1260x2940) (4k: 1789x4176)",
+              "value": "9:21"
+            }
+          ],
+          "advanced": true
+        },
+        {
+          "id": "maxImages",
+          "type": "number",
+          "label": "Maximum number of output images",
+          "sample": "1",
+          "required": true,
+          "placeholder": "Maximum number of output images",
+          "note": "This is the limiter for number of outputs. Number of input reference images + Number of generated must be smaller then or equal to 15.",
+          "options": [],
+          "min": 1,
+          "max": 15,
+          "advanced": true
+        },
+        {
+          "id": "watermark",
+          "type": "select",
+          "label": "Watermark",
+          "sample": "false",
+          "required": true,
+          "placeholder": "Watermark",
+          "note": "Whether the generated image(s) contains a watermark.",
+          "options": [
+            {
+              "label": "false",
+              "value": "false"
+            },
+            {
+              "label": "true",
+              "value": "true"
+            }
+          ],
+          "advanced": true
+        }
+      ]
+    }
+  ]
+}

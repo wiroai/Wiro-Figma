@@ -1,0 +1,227 @@
+{
+  "slug": "openai/gpt-image-2",
+  "title": "OpenAI GPT Image 2: Generation and Edits",
+  "description": "GPT Image 2 makes images and precise edits with sharp text and up to 4K output. Ideal for product shots and inpainting. Try GPT Image 2 by OpenAI on Wiro now.",
+  "categories": ["partner", "openai", "text-to-image", "image-to-image", "image-editing", "nogpu-pipeline"],
+  "pricing": "$0.003 to $0.712 / per request",
+  "estimatedCostUsd": null,
+  "parameters": [
+    {
+      "title": "",
+      "items": [
+        {
+          "id": "inputImage",
+          "type": "combinefileinput",
+          "label": "Input Images",
+          "sample": "https://cdn.wiro.ai/uploads/sampleinputs/openai-gpt-image-2-input-1.jpg",
+          "required": false,
+          "placeholder": "Input Images",
+          "note": "Optional. Input images to edit, up to 16.",
+          "options": [],
+          "advanced": false
+        },
+        {
+          "id": "prompt",
+          "type": "textarea",
+          "label": "Prompt",
+          "sample": "A hyper-detailed, high-resolution photographic edit based on image. The clear rocks glass, the metallic spoon, and the rich, dark mahogany wooden table with its complex grain and precise geometric shafts of warm sunlight must all remain in their exact positions and forms. Inside the glass, the simple iced coffee is replaced by a perfectly layered Café Bombón with complex, high-clarity details. A thick, smooth layer of sweetened condensed milk forms the base, topped by a precise layer of dark, rich espresso, and finally an elegant cap of airy, micro-foamed milk. The simple ice cubes are replaced by large, geometrically precise, slow-melting artisan ice spheres showing internal crystal structures and fractures, all glistening with heavy, detailed condensation on the glass. The metallic spoon is highly polished to a mirror-like finish, reflecting the layers of the drink and the wood. The dust motes floating in the sunbeams are rendered with extreme fidelity as delicate, golden, complex particles. The entire scene is polished to perfection, with the contrast between foam, liquid, glass, and wood grain maximized. The lighting is intensified, making the glass and its contents glow from within, all while maintaining the exact existing shadow patterns.",
+          "required": true,
+          "placeholder": "Enter your prompt...",
+          "note": "Required. Text description of the desired image or image edit. Maximum 32,000 characters.",
+          "options": [],
+          "advanced": false
+        },
+        {
+          "id": "inputImageMask",
+          "type": "combinefileinput",
+          "label": "Mask Image (Edit)",
+          "required": false,
+          "placeholder": "Mask Image (Edit only)",
+          "note": "Optional. Requires input image(1). Mask image to define specific areas to edit.",
+          "options": [],
+          "advanced": true
+        },
+        {
+          "id": "resolution",
+          "type": "select",
+          "label": "Resolution",
+          "sample": "1k",
+          "required": true,
+          "placeholder": "Resolution",
+          "note": "Required. Output resolution tier.",
+          "options": [
+            {
+              "label": "1K (~1 MP)",
+              "value": "1k"
+            },
+            {
+              "label": "2K (~2-4 MP, experimental)",
+              "value": "2k"
+            },
+            {
+              "label": "4K (~8 MP, experimental)",
+              "value": "4k"
+            }
+          ],
+          "advanced": false
+        },
+        {
+          "id": "ratio",
+          "type": "select",
+          "label": "Ratio",
+          "sample": "1:1",
+          "required": true,
+          "placeholder": "Ratio",
+          "note": "Required. Aspect ratio of the output image.",
+          "options": [
+            {
+              "label": "1:1 (square) — 1024x1024(1k) / 2048x2048(2k) / 2880x2880(4k)",
+              "value": "1:1"
+            },
+            {
+              "label": "3:2 (landscape) — 1536x1024(1k) / 2400x1600(2k) / 3456x2304(4k)",
+              "value": "3:2"
+            },
+            {
+              "label": "2:3 (portrait) — 1024x1536(1k) / 1600x2400(2k) / 2304x3456(4k)",
+              "value": "2:3"
+            },
+            {
+              "label": "4:3 (landscape) — 1280x960(1k) / 2048x1536(2k) / 3200x2400(4k)",
+              "value": "4:3"
+            },
+            {
+              "label": "3:4 (portrait) — 960x1280(1k) / 1536x2048(2k) / 2400x3200(4k)",
+              "value": "3:4"
+            },
+            {
+              "label": "16:9 (landscape) — 1280x720(1k) / 2048x1152(2k) / 3840x2160(4k)",
+              "value": "16:9"
+            },
+            {
+              "label": "9:16 (portrait) — 720x1280(1k) / 1152x2048(2k) / 2160x3840(4k)",
+              "value": "9:16"
+            }
+          ],
+          "advanced": false
+        },
+        {
+          "id": "quality",
+          "type": "select",
+          "label": "Quality",
+          "sample": "low",
+          "required": true,
+          "placeholder": "Quality",
+          "note": "Required. Output image quality.",
+          "options": [
+            {
+              "label": "Low",
+              "value": "low"
+            },
+            {
+              "label": "Medium",
+              "value": "medium"
+            },
+            {
+              "label": "High",
+              "value": "high"
+            }
+          ],
+          "advanced": true
+        },
+        {
+          "id": "background",
+          "type": "select",
+          "label": "Background",
+          "default": "auto",
+          "required": false,
+          "placeholder": "Background",
+          "note": "Optional. Background setting.",
+          "options": [
+            {
+              "label": "Auto",
+              "value": "auto"
+            },
+            {
+              "label": "Opaque",
+              "value": "opaque"
+            }
+          ],
+          "advanced": true
+        },
+        {
+          "id": "outputFormat",
+          "type": "select",
+          "label": "Output Format",
+          "default": "png",
+          "required": false,
+          "placeholder": "Output Format",
+          "note": "Optional. Output image format. Defaults to png.",
+          "options": [
+            {
+              "label": "PNG",
+              "value": "png"
+            },
+            {
+              "label": "JPEG",
+              "value": "jpeg"
+            },
+            {
+              "label": "WEBP",
+              "value": "webp"
+            }
+          ],
+          "advanced": true
+        },
+        {
+          "id": "outputCompression",
+          "type": "number",
+          "label": "Output Compression",
+          "default": "100",
+          "required": false,
+          "placeholder": "Output Compression (0-100)",
+          "note": "Optional. Compression level (0-100) for jpeg or webp output only. Defaults to 100.",
+          "options": [],
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "advanced": true
+        },
+        {
+          "id": "samples",
+          "type": "number",
+          "label": "Number of Images",
+          "sample": "1",
+          "required": true,
+          "placeholder": "Number of Images",
+          "note": "Required. Number of images to generate (1-10).",
+          "options": [],
+          "min": 1,
+          "max": 10,
+          "step": 1,
+          "advanced": true
+        },
+        {
+          "id": "moderation",
+          "type": "select",
+          "label": "Moderation Level",
+          "default": "low",
+          "required": false,
+          "placeholder": "Moderation Level",
+          "note": "Optional. Content moderation level.",
+          "options": [
+            {
+              "label": "Auto",
+              "value": "auto"
+            },
+            {
+              "label": "Low",
+              "value": "low"
+            }
+          ],
+          "advanced": true
+        }
+      ]
+    }
+  ]
+}

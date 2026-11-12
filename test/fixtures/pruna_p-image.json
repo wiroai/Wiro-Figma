@@ -1,0 +1,104 @@
+{
+  "slug": "pruna/p-image",
+  "title": "P-Image",
+  "description": "Turn a written prompt into one image with P-Image, which Pruna built for exact prompt adherence and text inside the frame. Try P-Image by Pruna on Wiro now.",
+  "categories": [
+    "use-agent",
+    "quick-showcase",
+    "partner",
+    "pruna",
+    "text-to-image",
+    "fast-inference",
+    "nogpu-pipeline"
+  ],
+  "pricing": "$0.005 / per request",
+  "estimatedCostUsd": null,
+  "parameters": [
+    {
+      "title": "",
+      "items": [
+        {
+          "id": "prompt",
+          "type": "textarea",
+          "label": "prompt",
+          "sample": "A documentary-quality wildlife photograph of a white Arctic Fox curled up on a snow-covered ridge during a light blizzard. Extreme focus on the detailed fur texture and the fox\\'s direct eye contact. Use a telephoto lens and soft, diffused overcast light, emphasizing the stark blue and white tones of the arctic environment.",
+          "required": true,
+          "placeholder": "prompt",
+          "note": "",
+          "options": [],
+          "advanced": false
+        },
+        {
+          "id": "aspectRatio",
+          "type": "select",
+          "label": "Aspect Ratio",
+          "default": "16:9",
+          "required": false,
+          "placeholder": "Aspect Ratio",
+          "note": "",
+          "options": [
+            {
+              "label": "16:9",
+              "value": "16:9"
+            },
+            {
+              "label": "9:16",
+              "value": "9:16"
+            },
+            {
+              "label": "3:2",
+              "value": "3:2"
+            },
+            {
+              "label": "2:3",
+              "value": "2:3"
+            },
+            {
+              "label": "4:3",
+              "value": "4:3"
+            },
+            {
+              "label": "3:4",
+              "value": "3:4"
+            },
+            {
+              "label": "1:1",
+              "value": "1:1"
+            }
+          ],
+          "advanced": true
+        },
+        {
+          "id": "seed",
+          "type": "text",
+          "label": "Seed",
+          "required": false,
+          "placeholder": "Seed",
+          "note": "Random seed. Leave zero to randomize the seed",
+          "options": [],
+          "advanced": true
+        },
+        {
+          "id": "disableSafetyChecker",
+          "type": "select",
+          "label": "Safety Checker",
+          "default": "false",
+          "required": false,
+          "placeholder": "Safety Checker",
+          "note": "Disable safety checker for generated images",
+          "options": [
+            {
+              "label": "True",
+              "value": "true"
+            },
+            {
+              "label": "False",
+              "value": "false"
+            }
+          ],
+          "advanced": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "slug": "black-forest-labs/flux-2-pro",
+  "title": "FLUX.2 Pro",
+  "description": "Edit a photo with a text instruction or combine up to 8 reference images into one new picture. Try FLUX.2 Pro by Black Forest Labs on Wiro now.",
+  "categories": ["bfl", "text-to-image", "partner", "flux-2-pro", "image-to-image", "image-editing", "nogpu-pipeline"],
+  "pricing": "$0.03 per run for an output image up to 1024 x 1024 pixels, plus $0.015 per further 1024 x 1024 block, plus $0.015 per 1024 x 1024 block of each input image (at most 4 blocks per image). Pixels are counted in blocks of 1024 x 1024 (1,048,576 pixels), and part of a block counts as a whole one: 1000 x 1050 is 2 blocks. Only the first output image is measured.",
+  "estimatedCostUsd": null,
+  "parameters": [
+    {
+      "title": "",
+      "items": [
+        {
+          "id": "inputImage",
+          "type": "combinefileinput",
+          "label": "Input Image",
+          "sample": "[\"https://cdn.wiro.ai/uploads/sampleinputs/bfl-flux-2-pro-input-5-1.jpg\",\"https://cdn.wiro.ai/uploads/sampleinputs/bfl-flux-2-pro-input-5-2.jpg\"]",
+          "required": false,
+          "placeholder": "Input Image",
+          "note": "",
+          "options": [],
+          "advanced": false
+        },
+        {
+          "id": "prompt",
+          "type": "textarea",
+          "label": "Prompt",
+          "sample": "Place the car in the image 2 to the road on the image 1.",
+          "required": true,
+          "placeholder": "prompt",
+          "note": "Text prompt for image generation.",
+          "options": [],
+          "advanced": false
+        },
+        {
+          "id": "width",
+          "type": "number",
+          "label": "Width",
+          "default": "1024",
+          "required": false,
+          "placeholder": "Width",
+          "note": "Width in pixels (must be multiple of 16). Set it to 0 or do not send if you want to match input image. Flux accepts between 64 and 2048.",
+          "options": [],
+          "min": 0,
+          "max": 2048,
+          "step": 16,
+          "advanced": true
+        },
+        {
+          "id": "height",
+          "type": "number",
+          "label": "Height",
+          "default": "1024",
+          "required": false,
+          "placeholder": "Height",
+          "note": "Height in pixels (must be multiple of 16). Set it to 0 or do not send if you want to match input image. Flux accepts between 64 and 2048.",
+          "options": [],
+          "min": 0,
+          "max": 2048,
+          "step": 16,
+          "advanced": true
+        },
+        {
+          "id": "safetyTolerance",
+          "type": "number",
+          "label": "Safety Tolerance",
+          "default": "2",
+          "required": false,
+          "placeholder": "Safety Tolerance",
+          "note": "Tolerance level for input and output moderation. Between 0 and 5, 0 being most strict, 5 being least strict.",
+          "options": [],
+          "min": 0,
+          "max": 5,
+          "advanced": true
+        },
+        {
+          "id": "seed",
+          "type": "number",
+          "label": "Seed",
+          "sample": "123",
+          "required": false,
+          "placeholder": "Seed",
+          "note": "Seed for reproducible results. Use the same seed to get consistent outputs.",
+          "options": [],
+          "min": 0,
+          "max": 9999999,
+          "step": 1,
+          "advanced": true
+        },
+        {
+          "id": "outputFormat",
+          "type": "select",
+          "label": "Output Format",
+          "default": "png",
+          "required": false,
+          "placeholder": "Output Format",
+          "note": "Output format for the generated image.",
+          "options": [
+            {
+              "label": "JPEG",
+              "value": "jpeg"
+            },
+            {
+              "label": "PNG",
+              "value": "png"
+            }
+          ],
+          "advanced": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "slug": "wiro/flux-2-dev",
+  "title": "FLUX.2 Dev",
+  "description": "FLUX.2 [dev], a 32B open-weight model, draws from text or merges people, pets and objects from up to 5 photos into a scene. Try FLUX.2 Dev by Wiro on Wiro now.",
+  "categories": [
+    "flux",
+    "text-to-image",
+    "bf16",
+    "persistent",
+    "fast-inference",
+    "price-list",
+    "image-to-image",
+    "image-editing"
+  ],
+  "pricing": "$0.006 / per request",
+  "estimatedCostUsd": null,
+  "parameters": [
+    {
+      "title": "",
+      "items": [
+        {
+          "id": "inputImage",
+          "type": "combinefileinput",
+          "label": "Input Image",
+          "sample": "[\"https://cdn.wiro.ai/uploads/sampleinputs/input-man-15.jpg\",\"https://cdn.wiro.ai/uploads/sampleinputs/kissing_input_2.jpg\"]",
+          "required": false,
+          "placeholder": "Input Image",
+          "note": "",
+          "options": [],
+          "advanced": false
+        },
+        {
+          "id": "prompt",
+          "type": "textarea",
+          "label": "prompt",
+          "sample": "The person from image 1 is petting the cat from image 2, the bird from image 3 is next to them",
+          "required": true,
+          "placeholder": "prompt",
+          "note": "prompt-help",
+          "options": [],
+          "advanced": false
+        },
+        {
+          "id": "steps",
+          "type": "number",
+          "label": "inferencesteps",
+          "default": "15",
+          "required": false,
+          "placeholder": "inferencesteps",
+          "note": "inferencesteps-help",
+          "options": [],
+          "min": 1,
+          "max": 50,
+          "step": 1,
+          "advanced": true
+        },
+        {
+          "id": "scale",
+          "type": "float",
+          "label": "guidancescale",
+          "default": "3.5",
+          "required": false,
+          "placeholder": "guidancescale",
+          "note": "guidancescale-help",
+          "options": [],
+          "min": 1,
+          "max": 20,
+          "step": 1,
+          "advanced": true
+        },
+        {
+          "id": "samples",
+          "type": "number",
+          "label": "Samples",
+          "default": "1",
+          "required": false,
+          "placeholder": "Samples",
+          "note": "Number of samples to process or generate.",
+          "options": [],
+          "min": 1,
+          "max": 8,
+          "step": 1,
+          "advanced": true
+        },
+        {
+          "id": "seed",
+          "type": "text",
+          "label": "seed",
+          "required": false,
+          "placeholder": "seed",
+          "note": "seed-help",
+          "options": [],
+          "advanced": true
+        },
+        {
+          "id": "width",
+          "type": "number",
+          "label": "width",
+          "default": "1024",
+          "required": false,
+          "placeholder": "width",
+          "note": "width-help",
+          "options": [],
+          "min": 0,
+          "max": 2048,
+          "step": 1,
+          "advanced": true
+        },
+        {
+          "id": "height",
+          "type": "number",
+          "label": "height",
+          "default": "1024",
+          "required": false,
+          "placeholder": "height",
+          "note": "height-help",
+          "options": [],
+          "min": 0,
+          "max": 2048,
+          "step": 1,
+          "advanced": true
+        }
+      ]
+    }
+  ]
+}

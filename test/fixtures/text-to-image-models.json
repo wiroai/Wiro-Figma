@@ -1,0 +1,458 @@
+[
+  {
+    "slug": "bytedance/seedream-v4-5-uncensored",
+    "title": "Seedream v4.5 Uncensored Image Generator",
+    "categories": [
+      "partner",
+      "ByteDance",
+      "image-to-image",
+      "text-to-image",
+      "quick-showcase",
+      "price-list",
+      "nogpu-pipeline"
+    ],
+    "pricing": "$0.04 / per output",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "bytedance/seedream-v5-pro-uncensored",
+    "title": "Seedream V5 Pro Uncensored (2K Image)",
+    "categories": [
+      "partner",
+      "ByteDance",
+      "image-to-image",
+      "text-to-image",
+      "quick-showcase",
+      "price-list",
+      "nogpu-pipeline",
+      "image-editing"
+    ],
+    "pricing": "$0.045 to $0.09 / per request",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "google/nano-banana-pro",
+    "title": "Nano Banana Pro API: Create Mobile & Web Apps with Nano Banana",
+    "categories": [
+      "partner",
+      "google",
+      "image-to-image",
+      "quick-showcase",
+      "text-to-image",
+      "price-list",
+      "fast-inference",
+      "image-editing",
+      "use-agent",
+      "nogpu-pipeline"
+    ],
+    "pricing": "$0.14 to $0.24 / per output",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "google/nano-banana-2",
+    "title": "Nano-Banana-2 Image Editing Tool",
+    "categories": [
+      "partner",
+      "google",
+      "image-to-image",
+      "quick-showcase",
+      "text-to-image",
+      "price-list",
+      "fast-inference",
+      "image-editing",
+      "use-agent",
+      "nogpu-pipeline"
+    ],
+    "pricing": "$0.045 to $0.151 / per output",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "wiro-partners/qwen-image-max-uncensored",
+    "title": "Qwen Image Max Uncensored",
+    "categories": ["partner", "nogpu-pipeline", "text-to-image", "image-to-image"],
+    "pricing": "$0.075 / per output",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "bytedance/seedream-v5-lite-uncensored",
+    "title": "Seedream v5 Lite Uncensored Image Generator",
+    "categories": [
+      "partner",
+      "ByteDance",
+      "image-to-image",
+      "text-to-image",
+      "quick-showcase",
+      "price-list",
+      "nogpu-pipeline"
+    ],
+    "pricing": "$0.035 / per output",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "openai/gpt-image-2",
+    "title": "OpenAI GPT Image 2: Generation and Edits",
+    "categories": ["partner", "openai", "text-to-image", "image-to-image", "image-editing", "nogpu-pipeline"],
+    "pricing": "$0.003 to $0.712 / per request",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "wiro-partners/z-image-pro-uncensored",
+    "title": "Z Image Pro Uncensored (Text-to-Image)",
+    "categories": ["partner", "nogpu-pipeline", "text-to-image"],
+    "pricing": "$0.02 / per request",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "openai/gpt-image-2-custom",
+    "title": "GPT Image 2 Custom by OpenAI",
+    "categories": ["partner", "openai", "text-to-image", "image-to-image", "image-editing", "nogpu-pipeline"],
+    "pricing": "Set by the run when it ends: Pricing is calculated from input and output tokens reported by OpenAI: text input $5 / 1M tokens, image input $8 / 1M tokens, image output $30 / 1M tokens. The final price is computed when the task finishes.",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "google/nano-banana",
+    "title": "Nano Banana API: Create Mobile & Web Apps with Nano Banana",
+    "categories": [
+      "partner",
+      "google",
+      "image-to-image",
+      "compare-landscape",
+      "use-agent",
+      "quick-showcase",
+      "text-to-image",
+      "price-list",
+      "fast-inference",
+      "image-editing",
+      "nogpu-pipeline"
+    ],
+    "pricing": "$0.039 / per output",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "wiro-partners/z-image-uncensored",
+    "title": "Z Image Uncensored (Wiro-Partners)",
+    "categories": ["partner", "nogpu-pipeline", "text-to-image"],
+    "pricing": "$0.013 to $0.014 / per request",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "bytedance/seedream-v4",
+    "title": "Seedream 4.0",
+    "categories": [
+      "partner",
+      "ByteDance",
+      "image-to-image",
+      "text-to-image",
+      "quick-showcase",
+      "price-list",
+      "nogpu-pipeline",
+      "image-editing"
+    ],
+    "pricing": "$0.03 / per output",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "google/nano-banana-2-1-advanced",
+    "title": "Nano Banana 2.1 Advanced (Google)",
+    "categories": [
+      "partner",
+      "google",
+      "image-to-image",
+      "quick-showcase",
+      "text-to-image",
+      "price-list",
+      "fast-inference",
+      "image-editing",
+      "use-agent",
+      "nogpu-pipeline"
+    ],
+    "pricing": "Set by the run when it ends: input (text/image/video/PDF) $1.50 per 1M tokens, text and thinking output $7.50 per 1M tokens, image output $30 per 1M tokens. Google Web/Image Search $0.014 per query. Higher thinking levels use more thinking tokens and cost more.",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "tencent/hunyuan-flux-srpo",
+    "title": "Hunyuan Flux SRPO",
+    "categories": ["flux", "text-to-image", "bf16", "persistent", "fast-inference"],
+    "pricing": "~$0.039349 per run (estimated)",
+    "estimatedCostUsd": 0.03934903047091412
+  },
+  {
+    "slug": "alibaba/qwen-image-3-0-pro",
+    "title": "Alibaba Qwen Image 3.0 Pro",
+    "categories": [
+      "partner",
+      "nogpu-pipeline",
+      "alibaba",
+      "quick-showcase",
+      "text-to-image",
+      "image-to-image",
+      "image-editing"
+    ],
+    "pricing": "$0.05 to $0.085 / per output",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "bytedance/text-to-image-seedream-v3",
+    "title": "Seedream 3.0",
+    "categories": ["partner", "ByteDance", "text-to-image", "price-list", "nogpu-pipeline"],
+    "pricing": "$0.03 / per request",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "tencent/hunyuanworld-text-to-panorama",
+    "title": "HunyuanWorld-1.0 Text to Panorama",
+    "categories": ["persistent", "model", "text-to-image", "hunyuanworld"],
+    "pricing": "~$0.076376 per run (estimated)",
+    "estimatedCostUsd": 0.0763764705882353
+  },
+  {
+    "slug": "wiro/text-to-image-flux",
+    "title": "Flux Text to Image",
+    "categories": ["flux", "text-to-image", "bf16", "persistent", "price-list"],
+    "pricing": "~$0.022595 per run (estimated)",
+    "estimatedCostUsd": 0.0225946949602122
+  },
+  {
+    "slug": "google/nano-banana-2-1",
+    "title": "Nano Banana 2.1 Image Generator (Google)",
+    "categories": [
+      "partner",
+      "google",
+      "image-to-image",
+      "quick-showcase",
+      "text-to-image",
+      "price-list",
+      "fast-inference",
+      "image-editing",
+      "use-agent",
+      "nogpu-pipeline"
+    ],
+    "pricing": "$0.0336 to $0.113 / per request",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "bytedance/seedream-v5-pro",
+    "title": "Seedream V5 Pro by ByteDance (Image)",
+    "categories": [
+      "partner",
+      "ByteDance",
+      "image-to-image",
+      "text-to-image",
+      "quick-showcase",
+      "price-list",
+      "nogpu-pipeline",
+      "image-editing"
+    ],
+    "pricing": "$0.045 to $0.09 / per request",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "xai/grok-imagine-image",
+    "title": "Grok Imagine Image by xAI",
+    "categories": ["partner", "xai", "text-to-image", "image-to-image", "nogpu-pipeline", "image-editing"],
+    "pricing": "$0.02 / per output",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "openai/gpt-image-1-5",
+    "title": "GPT Image 1.5 - Text-to-Image & Image Editing",
+    "categories": ["partner", "openai", "text-to-image", "image-to-image", "image-editing", "nogpu-pipeline"],
+    "pricing": "$0.009 to $0.2 / per request",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "bytedance/seedream-v4-5",
+    "title": "Seedream 4.5",
+    "categories": [
+      "partner",
+      "ByteDance",
+      "image-to-image",
+      "text-to-image",
+      "quick-showcase",
+      "price-list",
+      "nogpu-pipeline",
+      "image-editing"
+    ],
+    "pricing": "$0.04 / per output",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "black-forest-labs/flux-2-flex",
+    "title": "FLUX.2 Flex",
+    "categories": [
+      "bfl",
+      "partner",
+      "flux-2-flex",
+      "text-to-image",
+      "image-to-image",
+      "image-editing",
+      "nogpu-pipeline"
+    ],
+    "pricing": "$0.06 per run for an output image up to 1024 x 1024 pixels, plus $0.06 per further 1024 x 1024 block, plus $0.06 per 1024 x 1024 block of each input image (at most 4 blocks per image)",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "black-forest-labs/flux-2-pro",
+    "title": "FLUX.2 Pro",
+    "categories": [
+      "bfl",
+      "text-to-image",
+      "partner",
+      "flux-2-pro",
+      "image-to-image",
+      "image-editing",
+      "nogpu-pipeline"
+    ],
+    "pricing": "$0.03 per run for an output image up to 1024 x 1024 pixels, plus $0.015 per further 1024 x 1024 block, plus $0.015 per 1024 x 1024 block of each input image (at most 4 blocks per image)",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "bytedance/text-to-image-seedream-v4",
+    "title": "Seedream 4.0 Text to Image",
+    "categories": ["partner", "ByteDance", "text-to-image", "nogpu-pipeline"],
+    "pricing": "$0.03 / per request",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "wiro/flux-2-dev",
+    "title": "FLUX.2 Dev",
+    "categories": [
+      "flux",
+      "text-to-image",
+      "bf16",
+      "persistent",
+      "fast-inference",
+      "price-list",
+      "image-to-image",
+      "image-editing"
+    ],
+    "pricing": "$0.006 / per request",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "openai/gpt-image-2-6-sunburst-custom",
+    "title": "GPT Image 2.6 Sunburst Custom",
+    "categories": ["partner", "openai", "text-to-image", "image-to-image", "image-editing", "nogpu-pipeline"],
+    "pricing": "Set by the run when it ends: Pricing is calculated from input and output tokens reported by OpenAI: text input $5 / 1M tokens, image input $8 / 1M tokens, image output $30 / 1M tokens. SVG output also bills the gpt-6.1-terra tokens that write the SVG: $1 / 1M input, $5 / 1M output. The final price is computed when the task finishes.",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "qwen/qwen-image-2-1",
+    "title": "Qwen Image 2.1",
+    "categories": ["text-to-image", "bf16", "persistent", "qwen", "model", "H200", "image-to-image", "image-editing"],
+    "pricing": "~$0.052244 per run (estimated)",
+    "estimatedCostUsd": 0.05224404532304725
+  },
+  {
+    "slug": "openai/gpt-image-2-5-sunburst-custom",
+    "title": "GPT Image 2.5 Sunburst (Custom)",
+    "categories": ["partner", "openai", "text-to-image", "image-to-image", "image-editing", "nogpu-pipeline"],
+    "pricing": "Set by the run when it ends: Pricing is calculated from input and output tokens reported by OpenAI: text input $5 / 1M tokens, image input $8 / 1M tokens, image output $30 / 1M tokens. The final price is computed when the task finishes.",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "openai/gpt-image-2-5-sunburst",
+    "title": "GPT Image 2.5 Sunburst (OpenAI)",
+    "categories": ["partner", "openai", "text-to-image", "image-to-image", "image-editing", "nogpu-pipeline"],
+    "pricing": "$0.003 to $0.712 / per request",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "openai/gpt-image-2-5-flare",
+    "title": "GPT Image 2.5 Flare Image Generator",
+    "categories": ["partner", "openai", "text-to-image", "image-to-image", "image-editing", "nogpu-pipeline"],
+    "pricing": "$0.003 to $0.712 / per request",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "microsoft/lens",
+    "title": "Microsoft Lens Text-to-Image",
+    "categories": ["persistent", "fast-inference", "price-list", "text-to-image", "model", "H200"],
+    "pricing": "$0.03 / per request",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "zai-org/glm-image",
+    "title": "GLM-Image",
+    "categories": [
+      "text-to-image",
+      "bf16",
+      "persistent",
+      "fast-inference",
+      "price-list",
+      "image-to-image",
+      "image-editing"
+    ],
+    "pricing": "$0.03 / per request",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "black-forest-labs/flux-2-klein-base-9b",
+    "title": "FLUX.2 Klein Base 9B",
+    "categories": [
+      "flux",
+      "text-to-image",
+      "bf16",
+      "persistent",
+      "fast-inference",
+      "price-list",
+      "model",
+      "image-to-image",
+      "H200",
+      "image-editing"
+    ],
+    "pricing": "$0.011 per run for an output image up to 1024 x 1024 pixels, plus $0.011 per further 1024 x 1024 block, plus $0.011 per 1024 x 1024 block of each input image (at most 4 blocks per image)",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "reve/create-v2",
+    "title": "Reve Create V2 Image Generator",
+    "categories": ["use-agent", "quick-showcase", "text-to-image", "reve", "partner", "nogpu-pipeline"],
+    "pricing": "$0.024 / per request",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "wiro/image-edit-general",
+    "title": "Image Edit General",
+    "categories": [
+      "compare-landscape",
+      "fast-inference",
+      "image-to-image",
+      "image-editing",
+      "text-to-image",
+      "partner",
+      "nogpu-pipeline"
+    ],
+    "pricing": "$0.1 / per request",
+    "estimatedCostUsd": null
+  },
+  {
+    "slug": "hidreamai/hidream-i1-fast",
+    "title": "HiDreamAI Fast",
+    "categories": [
+      "text-to-image",
+      "persistent",
+      "model",
+      "hidreamai",
+      "checkpoint-folder",
+      "quick-showcase",
+      "price-list"
+    ],
+    "pricing": "~$0.063348 per run (estimated)",
+    "estimatedCostUsd": 0.06334751131221719
+  },
+  {
+    "slug": "hidreamai/hidream-i1-full",
+    "title": "HiDreamAI Full",
+    "categories": ["text-to-image", "persistent", "model", "hidreamai", "checkpoint-folder"],
+    "pricing": "~$0.09608 per run (estimated)",
+    "estimatedCostUsd": 0.096080412371134
+  },
+  {
+    "slug": "qwen/qwen-image",
+    "title": "Qwen Image",
+    "categories": ["text-to-image", "bf16", "persistent", "qwen", "model"],
+    "pricing": "~$0.070586 per run (estimated)",
+    "estimatedCostUsd": 0.07058583569405098
+  }
+]

@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Wiro AI plugin harness</title>
+    <style>
+      :root {
+        --canvas: #e5e5e5;
+        --ink: #1e1e1e;
+        --muted: #6e6e6e;
+        --select: #0d99ff;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        font:
+          12px/1.4 Inter,
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+        color: var(--ink);
+        background: var(--canvas);
+      }
+      body {
+        display: flex;
+      }
+      #stage {
+        flex: 1;
+        position: relative;
+        overflow: auto;
+      }
+      #hint {
+        position: sticky;
+        top: 0;
+        left: 0;
+        z-index: 2;
+        padding: 8px 12px;
+        color: var(--muted);
+        background: rgba(229, 229, 229, 0.92);
+      }
+      #world {
+        position: absolute;
+        left: 40px;
+        top: 56px;
+        transform-origin: 0 0;
+      }
+      .node {
+        position: absolute;
+        background: #ffffff center / cover no-repeat;
+        outline: 1px solid rgba(0, 0, 0, 0.08);
+        cursor: pointer;
+      }
+      .node.ellipse {
+        border-radius: 50%;
+      }
+      .node.group {
+        background: transparent;
+        outline: 1px dashed rgba(0, 0, 0, 0.35);
+      }
+      .node.selected {
+        outline: 6px solid var(--select);
+        z-index: 1;
+      }
+      .node .label {
+        position: absolute;
+        left: 0;
+        top: calc(-18px * var(--inverse, 1));
+        font-size: calc(11px * var(--inverse, 1));
+        color: var(--muted);
+        white-space: nowrap;
+      }
+      body.clean #hint,
+      body.clean #toasts {
+        visibility: hidden;
+      }
+      #plugin {
+        flex: none;
+        margin: 12px;
+        align-self: flex-start;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow:
+          0 2px 14px rgba(0, 0, 0, 0.15),
+          0 0 0 0.5px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+      }
+      #plugin-title {
+        display: flex;
+        align-items: center;
+        height: 40px;
+        padding: 0 12px;
+        font-weight: 600;
+        border-bottom: 1px solid #e6e6e6;
+      }
+      #plugin iframe {
+        display: block;
+        border: 0;
+      }
+      body.dark #plugin {
+        background: #2c2c2c;
+        color: #ffffff;
+      }
+      body.dark #plugin-title {
+        border-color: #444444;
+      }
+      #toasts {
+        position: fixed;
+        left: 50%;
+        bottom: 20px;
+        transform: translateX(-50%);
+        display: grid;
+        gap: 6px;
+        z-index: 5;
+      }
+      .toast {
+        background: #1e1e1e;
+        color: #ffffff;
+        padding: 8px 14px;
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+      .toast.error {
+        background: #c4320a;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <div id="hint">
+        Test harness for the Wiro AI plugin. Click a layer to select it, Shift-click to add more, click the background
+        to clear. The plugin runs dist/code.js against a stand-in for the Figma API, and dist/ui.html in a sandboxed
+        iframe with the manifest's network rules.
+      </div>
+      <div id="world"></div>
+    </div>
+    <div id="plugin">
+      <div id="plugin-title">Wiro AI</div>
+      <div id="plugin-body"></div>
+    </div>
+    <div id="toasts"></div>
+    <script src="/fake-figma.js"></script>
+  </body>
+</html>

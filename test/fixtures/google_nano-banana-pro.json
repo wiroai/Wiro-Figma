@@ -1,0 +1,159 @@
+{
+  "slug": "google/nano-banana-pro",
+  "title": "Nano Banana Pro API: Create Mobile & Web Apps with Nano Banana",
+  "description": "Create and edit 4K images with legible text, charts and up to 14 reference images on Gemini 3 Pro Image. Try Nano Banana Pro by Google on Wiro now.",
+  "categories": [
+    "partner",
+    "google",
+    "image-to-image",
+    "quick-showcase",
+    "text-to-image",
+    "price-list",
+    "fast-inference",
+    "image-editing",
+    "use-agent",
+    "nogpu-pipeline"
+  ],
+  "pricing": "$0.14 to $0.24 / per output",
+  "estimatedCostUsd": null,
+  "parameters": [
+    {
+      "title": "",
+      "items": [
+        {
+          "id": "inputImage",
+          "type": "combinefileinput",
+          "label": "Input Image",
+          "sample": "[\"https://cdn.wiro.ai/uploads/sampleinputs/google-nano-banana-pro-input-1-1.jpg\",\"https://cdn.wiro.ai/uploads/sampleinputs/google-nano-banana-pro-input-1-2.jpg\",\"https://cdn.wiro.ai/uploads/sampleinputs/google-nano-banana-pro-input-1-3.jpg\",\"https://cdn.wiro.ai/uploads/sampleinputs/google-nano-banana-pro-input-1-4.jpg\",\"https://cdn.wiro.ai/uploads/sampleinputs/google-nano-banana-pro-input-1-5.jpg\",\"https://cdn.wiro.ai/uploads/sampleinputs/google-nano-banana-pro-input-1-6.jpg\"]",
+          "required": false,
+          "placeholder": "Input Image",
+          "note": "Gemini 3 Pro Preview lets you to mix up to 14 reference images. These 14 images can include the following:  to 6 images of objects with high-fidelity to include in the final image, to 5 images of humans to maintain character consistency",
+          "options": [],
+          "advanced": false
+        },
+        {
+          "id": "prompt",
+          "type": "textarea",
+          "label": "prompt",
+          "sample": "Create a realistic group photo using the people from the input images. Place all of them standing together in an open grassy field during daylight. Ensure natural proportions, accurate facial features, and consistent styling. The man should be wearing a well-fitted three-piece suit, and the women should be wearing elegant, colorful dresses. Use soft natural lighting, gentle shadows, and a balanced composition. Maintain photorealism and keep all poses natural and relaxed.",
+          "required": true,
+          "placeholder": "prompt",
+          "note": "The prompt to generate the image.",
+          "options": [],
+          "advanced": false
+        },
+        {
+          "id": "aspectRatio",
+          "type": "select",
+          "label": "Aspect Ratio",
+          "required": false,
+          "placeholder": "Aspect Ratio",
+          "note": "Aspect Ratio of the output image",
+          "options": [
+            {
+              "label": "Match Input Image",
+              "value": ""
+            },
+            {
+              "label": "1:1 (1K)1024x1024 (2K)2048x2048 (4K)4096x4096",
+              "value": "1:1"
+            },
+            {
+              "label": "2:3 (1K)848x1264 (2K)1696x2528 (4K)3392x5056",
+              "value": "2:3"
+            },
+            {
+              "label": "3:2 (1K)1264x848 (2K)2528x1696 (4K)5056x3392",
+              "value": "3:2"
+            },
+            {
+              "label": "3:4 (1K)896x1200 (2K)1792x2400 (4K)3584x4800",
+              "value": "3:4"
+            },
+            {
+              "label": "4:3 (1K)1200x896 (2K)2400x1792 (4K)4800x3584",
+              "value": "4:3"
+            },
+            {
+              "label": "4:5 (1K)928x1152 (2K)1856x2304 (4K)3712x4608",
+              "value": "4:5"
+            },
+            {
+              "label": "5:4 (1K)1152x928 (2K)2304x1856 (4K)4608x3712",
+              "value": "5:4"
+            },
+            {
+              "label": "9:16 (1K)768x1376 (2K)1536x2752 (4K)3072x5504",
+              "value": "9:16"
+            },
+            {
+              "label": "16:9 (1K)1376x768 (2K)2752x1536 (4K)5504x3072",
+              "value": "16:9"
+            },
+            {
+              "label": "21:9 (1K)1584x672 (2K)3168x1344 (4K)6336x2688",
+              "value": "21:9"
+            }
+          ],
+          "advanced": true
+        },
+        {
+          "id": "resolution",
+          "type": "select",
+          "label": "Resolution (K)",
+          "default": "1K",
+          "required": false,
+          "placeholder": "Resolution",
+          "note": "Default is 1K",
+          "options": [
+            {
+              "label": "1K (Standard)",
+              "value": "1K"
+            },
+            {
+              "label": "2K (High)",
+              "value": "2K"
+            },
+            {
+              "label": "4K (Ultra High)",
+              "value": "4K"
+            }
+          ],
+          "advanced": true
+        },
+        {
+          "id": "safetySetting",
+          "type": "select",
+          "label": "Safety Setting",
+          "default": "OFF",
+          "required": false,
+          "placeholder": "Safety Setting",
+          "note": "Safety Setting",
+          "options": [
+            {
+              "label": "BLOCK_LOW_AND_ABOVE",
+              "value": "BLOCK_LOW_AND_ABOVE"
+            },
+            {
+              "label": "BLOCK_MEDIUM_AND_ABOVE",
+              "value": "BLOCK_MEDIUM_AND_ABOVE"
+            },
+            {
+              "label": "BLOCK_ONLY_HIGH",
+              "value": "BLOCK_ONLY_HIGH"
+            },
+            {
+              "label": "BLOCK_NONE",
+              "value": "BLOCK_NONE"
+            },
+            {
+              "label": "OFF",
+              "value": "OFF"
+            }
+          ],
+          "advanced": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "Wiro AI Image Generator",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "dist/ui.html",
+  "editorType": ["figma"],
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": ["https://mcp.wiro.ai", "https://cdn1.wiro.ai"],
+    "reasoning": "The plugin sends your prompt and settings to the Wiro AI API at mcp.wiro.ai to generate images, and downloads the finished images from the Wiro AI file server at cdn1.wiro.ai."
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "name": "wiro-figma",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Wiro AI plugin for Figma: generate images from a prompt with Wiro AI image models and place them as image fills.",
+  "license": "MIT",
+  "author": "Wiro AI",
+  "homepage": "https://wiro.ai",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wiroai/Wiro-Figma.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wiroai/Wiro-Figma/issues"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "watch": "node scripts/build.mjs --watch",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.ui.json && tsc -p tsconfig.test.json && tsc -p tsconfig.test-main.json",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:live": "WIRO_LIVE_TEST=1 vitest run test/live",
+    "harness": "node scripts/build.mjs && node test/harness/server.mjs",
+    "check": "node scripts/check-plugin.mjs",
+    "all": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build && npm run check"
+  },
+  "dependencies": {
+    "preact": "^11.2.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@figma/eslint-plugin-figma-plugins": "^1.0.0",
+    "@figma/plugin-typings": "^1.142.0",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.14.0",
+    "globals": "^17.14.0",
+    "prettier": "3.9.10",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vitest": "^5.1.0"
+  }
+}
