@@ -180,7 +180,7 @@ npm run all        # formatting, lint, type check, tests, build and the plugin c
 | [Wiro-Blender](https://github.com/wiroai/Wiro-Blender)                       | Wiro AI add-on for Blender: text to 3D, image to 3D and textures                                                                                        |
 | [Wiro-Next-Starter](https://github.com/wiroai/Wiro-Next-Starter)             | Next.js starter for Wiro AI: Playground, image, video and audio tools, and LLM chat, ready for Vercel and Railway                                       |
 | [Wiro-Docs](https://github.com/wiroai/Wiro-Docs)                             | Source of the Wiro AI API docs                                                                                                                          |
-| [wiroai.github.io](https://wiroai.github.io) | Every open-source project from Wiro AI on one page, with a page for each repository |
+| [wiroai.github.io](https://wiroai.github.io)                                 | Every open-source project from Wiro AI on one page, with a page for each repository                                                                     |
 
 [Website](https://wiro.ai) · [Models](https://wiro.ai/models) · [Docs](https://wiro.ai/docs) · [X](https://x.com/wiroai)
 
