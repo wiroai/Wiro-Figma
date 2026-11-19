@@ -1,5 +1,6 @@
 {
   "name": "Wiro AI Image Generator",
+  "id": "1705106544966242306",
   "api": "1.0.0",
   "main": "dist/code.js",
   "ui": "dist/ui.html",
